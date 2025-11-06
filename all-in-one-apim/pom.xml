@@ -53,13 +53,6 @@
         <module>modules/integration</module>
     </modules>
 
-    <scm>
-        <url>https://github.com/wso2/product-apim.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/product-apim.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/product-apim.git</connection>
-        <tag>v4.6.0-rc4</tag>
-    </scm>
-
     <repositories>
         <repository>
             <id>wso2-nexus</id>
@@ -1301,8 +1294,6 @@
 
 
     <properties>
-
-        <project.scm.id>scm-server</project.scm.id>
 
         <carbon.analytics.common.version>5.3.27</carbon.analytics.common.version>
 
