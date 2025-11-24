@@ -2695,5 +2695,8 @@
   "multi_tenancy.stratos.manager_service.admin_username": "admin",
   "multi_tenancy.stratos.manager_service.admin_password": "admin",
   "multi_tenancy.stratos.google_analytics_url": "http://google-analytics.js",
-  "multi_tenancy.stratos.sso_loading_message": "Loading..."
+  "multi_tenancy.stratos.sso_loading_message": "Loading...",
+  "user_store_commons.enable_circuit_breaker_for_user_stores": true,
+  "user_store_commons.max_connection_retry_count": "5",
+  "user_store_commons.min_connection_retry_delay_in_milli_seconds": "60000"
 }
