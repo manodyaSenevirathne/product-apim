@@ -833,6 +833,8 @@
   "signature_util.enable_sha256_algo": false,
   "clustering.agent": "org.wso2.carbon.hazelcast.HazelcastClusteringAgent",
   "remote_logging.config_sync.period": "15",
+  "remote_logging.hide_secrets": false,
+  "remote_logging.encrypt_secrets": false,
   "admin_console.resolve_absolute_urls.enable": false,
   "database.apim_db.validationQuery": "SELECT 1",
   "database.apim_db.username": "wso2carbon",
