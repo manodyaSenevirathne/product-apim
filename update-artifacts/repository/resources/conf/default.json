@@ -442,6 +442,12 @@
       "secure": true,
       "http_method": "POST",
       "permissions": "/permission/admin"
+    },
+    {
+      "context": "(.*)/usage-data-receiver/(.*)",
+      "secure": true,
+      "http_method": "POST",
+      "permissions": "/permission/admin"
     }
   ],
   "qpid.nio": false,
