@@ -62,84 +62,85 @@
 
 <!doctype html>
 <html lang="en-US">
-<head>
-    <%
-        File headerFile = new File(getServletContext().getRealPath("extensions/header.jsp"));
-        if (headerFile.exists()) {
-    %>
-    <jsp:include page="extensions/header.jsp"/>
-    <% } else { %>
-    <jsp:include page="includes/header.jsp"/>
-    <% } %>
-</head>
-<body>
-    <layout:main layoutName="<%= layout %>" layoutFileRelativePath="<%= layoutFileRelativePath %>" data="<%= layoutData %>" >
-        <layout:component componentName="ProductHeader" >
+    <head>
+        <%
+            File headerFile = new File(getServletContext().getRealPath("extensions/header.jsp"));
+            if (headerFile.exists()) {
+        %>
+        <jsp:include page="extensions/header.jsp"/>
+        <% } else { %>
+        <jsp:include page="includes/header.jsp"/>
+        <% } %>
+    </head>
+    <body>
+        <layout:main layoutName="<%= layout %>" layoutFileRelativePath="<%= layoutFileRelativePath %>"
+                     data="<%= layoutData %>">
+            <layout:component componentName="ProductHeader">
 
-        </layout:component>
-        <layout:component componentName="MainSection" >
+            </layout:component>
+            <layout:component componentName="MainSection">
 
-        </layout:component>
-        <layout:component componentName="ProductFooter" >
+            </layout:component>
+            <layout:component componentName="ProductFooter">
 
-        </layout:component>
-    </layout:main>
+            </layout:component>
+        </layout:main>
 
-    <div class="ui tiny modal notify">
-        <div class="header">
-            <h4 class="modal-title"><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
-                    "Information")%>
-            </h4>
+        <div class="ui tiny modal notify">
+            <div class="header">
+                <h4 class="modal-title"><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
+                        "Information")%>
+                </h4>
+            </div>
+            <div class="content">
+                <p><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
+                        "Username.recovery.information.sent.to.your.email")%>
+                </p>
+            </div>
+            <div class="actions">
+                <button type="button" class="ui primary button cancel" data-dismiss="modal">
+                    <%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle, "Close")%>
+                </button>
+            </div>
         </div>
-        <div class="content">
-            <p><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
-                    "Username.recovery.information.sent.to.your.email")%>
-            </p>
-        </div>
-        <div class="actions">
-            <button type="button" class="ui primary button cancel" data-dismiss="modal">
-                <%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle, "Close")%>
-            </button>
-        </div>
-    </div>
 
-    <%-- footer --%>
-    <%
-        File footerFile = new File(getServletContext().getRealPath("extensions/footer.jsp"));
-        if (footerFile.exists()) {
-    %>
+        <%-- footer --%>
+        <%
+            File footerFile = new File(getServletContext().getRealPath("extensions/footer.jsp"));
+            if (footerFile.exists()) {
+        %>
         <jsp:include page="extensions/footer.jsp"/>
-    <% } else { %>
+        <% } else { %>
         <jsp:include page="includes/footer.jsp"/>
-    <% } %>
+        <% } %>
 
-    <script type="application/javascript">
+        <script type="application/javascript">
 
-        $(document).ready(function () {
-            $(".notify").modal({
-                blurring: true,
-                closable: false,
-                onHide: function () {
-                    <%
-                    try {
-                        if (callback != null && AuthenticationEndpointUtil.isSchemeSafeURL(callback)) {
-                    %>
-                    location.href = "<%= IdentityManagementEndpointUtil.getURLEncodedCallback(callback)%>";
-                    <%
-                    }
-                    } catch (URISyntaxException e) {
-                        request.setAttribute("error", true);
-                        request.setAttribute("errorMsg", "Invalid callback URL found in the request.");
-                        if (!StringUtils.isBlank(username)) {
-                            request.setAttribute("username", username);
+            $(document).ready(function () {
+                $(".notify").modal({
+                    blurring: true,
+                    closable: false,
+                    onHide: function () {
+                        <%
+                        try {
+                            if (callback != null && AuthenticationEndpointUtil.isSchemeSafeURL(callback)) {
+                        %>
+                        location.href = "<%= IdentityManagementEndpointUtil.getURLEncodedCallback(callback)%>";
+                        <%
                         }
-                        request.getRequestDispatcher("error.jsp").forward(request, response);
-                        return;
+                        } catch (URISyntaxException e) {
+                            request.setAttribute("error", true);
+                            request.setAttribute("errorMsg", "Invalid callback URL found in the request.");
+                            if (!StringUtils.isBlank(username)) {
+                                request.setAttribute("username", username);
+                            }
+                            request.getRequestDispatcher("error.jsp").forward(request, response);
+                            return;
+                        }
+                        %>
                     }
-                    %>
-                }
-            }).modal("show");
-        });
-    </script>
-</body>
+                }).modal("show");
+            });
+        </script>
+    </body>
 </html>
