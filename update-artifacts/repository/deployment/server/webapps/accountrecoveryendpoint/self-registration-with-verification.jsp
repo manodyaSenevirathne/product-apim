@@ -43,6 +43,10 @@
 <%@ page import="org.wso2.carbon.identity.core.util.IdentityTenantUtil" %>
 <%@ page import="org.wso2.carbon.utils.multitenancy.MultitenantConstants" %>
 <%@ page import="org.wso2.carbon.utils.multitenancy.MultitenantUtils" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceService" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceServiceImpl" %>
+<%@ page import="org.wso2.carbon.identity.governance.bean.ConnectorConfig" %>
+<%@ page import="org.wso2.carbon.identity.application.common.model.Property" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.ArrayList" %>
@@ -67,6 +71,11 @@
     String username = request.getParameter("username");
     String consentPurposeGroupName = "SELF-SIGNUP";
     String consentPurposeGroupType = "SYSTEM";
+    String SELF_SIGN_UP_CONNECTOR = "self-sign-up";
+    String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
+    String SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION = "SelfRegistration.NotifyAccountConfirmation";
+    boolean isShowUsernameUnavailabilityEnabled = true;
+    boolean isAccountVerificationEnabled = false;
     String JIT = "JIT";
     String[] missingClaimList = new String[0];
     String[] missingClaimDisplayName = new String[0];
@@ -112,6 +121,18 @@
         }
     }
     user = IdentityManagementServiceUtil.getInstance().resolveUser(tenantQualifiedUsername, tenantDomain, isSaaSApp);
+
+    IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
+    ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(user.getTenantDomain(), SELF_SIGN_UP_CONNECTOR);
+    Property[] properties = connectorConfig.getProperties();
+    for (Property property : properties) {
+        if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
+            isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+        }
+        if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
+            isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
+        }
+    }
 
     if (StringUtils.isEmpty(username)) {
         request.setAttribute("error", true);
@@ -178,7 +199,9 @@
         return;
     }
     Integer userNameValidityStatusCode = usernameValidityResponse.getInt("code");
+    session.setAttribute("userNameValidityStatusCode", userNameValidityStatusCode);
     if (!SelfRegistrationStatusCodes.CODE_USER_NAME_AVAILABLE.equalsIgnoreCase(userNameValidityStatusCode.toString())) {
+        String errorCode = String.valueOf(userNameValidityStatusCode);
         if (allowchangeusername || !skipSignUpEnableCheck) {
             request.setAttribute("error", true);
             request.setAttribute("errorCode", userNameValidityStatusCode);
@@ -187,9 +210,12 @@
                     request.setAttribute("errorMessage", usernameValidityResponse.getString("message"));
                 }
             }
-            request.getRequestDispatcher("register.do").forward(request, response);
+            if (!(isAccountVerificationEnabled && !isShowUsernameUnavailabilityEnabled) ||
+                    !SelfRegistrationStatusCodes.ERROR_CODE_USER_ALREADY_EXISTS.equalsIgnoreCase(errorCode)) {
+                request.getRequestDispatcher("register.do").forward(request, response);
+                return;
+            }
         } else {
-            String errorCode = String.valueOf(userNameValidityStatusCode);
             if (SelfRegistrationStatusCodes.ERROR_CODE_INVALID_TENANT.equalsIgnoreCase(errorCode)) {
                 errorMsg = "Invalid tenant domain - " + user.getTenantDomain() + ".";
             } else if (SelfRegistrationStatusCodes.ERROR_CODE_USER_ALREADY_EXISTS.equalsIgnoreCase(errorCode)) {
@@ -202,8 +228,8 @@
             request.setAttribute("errorMsg", errorMsg + " Please contact the administrator to fix this issue.");
             request.setAttribute("errorCode", errorCode);
             request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
         }
-        return;
     }
     String purposes = selfRegistrationMgtClient.getPurposes(user.getTenantDomain(), consentPurposeGroupName,
             consentPurposeGroupType);

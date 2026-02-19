@@ -21,6 +21,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.wso2.carbon.core.SameSiteCookie" %>
 <%@ page import="org.wso2.carbon.core.util.SignatureUtil" %>
+<%@ page import="org.wso2.carbon.identity.mgt.constants.SelfRegistrationStatusCodes" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.IdentityManagementEndpointConstants" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.IdentityManagementServiceUtil" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.client.ApiException" %>
@@ -42,6 +43,9 @@
 <%@ page import="java.util.Base64" %>
 <%@ page import="org.wso2.carbon.identity.core.util.IdentityUtil" %>
 <%@ page import="javax.servlet.http.Cookie" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceService" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceServiceImpl" %>
+<%@ page import="org.wso2.carbon.identity.governance.bean.ConnectorConfig" %>
 
 <jsp:directive.include file="includes/localize.jsp"/>
 <jsp:directive.include file="tenant-resolve.jsp"/>
@@ -90,14 +94,23 @@
                 String ERROR_CODE = "errorCode";
                 String SELF_REGISTRATION_WITH_VERIFICATION_PAGE = "self-registration-with-verification.jsp";
                 String SELF_REGISTRATION_WITHOUT_VERIFICATION_PAGE = "* self-registration-without-verification.jsp";
+                String SELF_REGISTRATION_COMPLETE_PAGE = "self-registration-complete.jsp";
+
                 String passwordPatternErrorCode = "20035";
                 String invalidCharErrorCode = "20067";
+                String usernameAlreadyExistsErrorCode = "20030";
                 String AUTO_LOGIN_COOKIE_NAME = "ALOR";
                 String AUTO_LOGIN_COOKIE_DOMAIN = "AutoLoginCookieDomain";
                 String AUTO_LOGIN_FLOW_TYPE = "SIGNUP";
                 PreferenceRetrievalClient preferenceRetrievalClient = new PreferenceRetrievalClient();
                 Boolean isAutoLoginEnable = preferenceRetrievalClient.checkAutoLoginAfterSelfRegistrationEnabled(tenantDomain);
                 Boolean isSelfRegistrationWithVerificationEnabled = preferenceRetrievalClient.checkSelfRegistrationLockOnCreation(tenantDomain);
+
+                String SELF_SIGN_UP_CONNECTOR = "self-sign-up";
+                String SHOW_USERNAME_UNAVAILABILITY = "SelfRegistration.ShowUsernameUnavailability";
+                String SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION = "SelfRegistration.NotifyAccountConfirmation";
+                boolean isShowUsernameUnavailabilityEnabled = true;
+                boolean isAccountVerificationEnabled = false;
 
                 boolean isSelfRegistrationWithVerification =
                         Boolean.parseBoolean(request.getParameter("isSelfRegistrationWithVerification"));
@@ -144,9 +157,9 @@
                     request.setAttribute("errorMsg", IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
                             "Username.cannot.be.empty"));
                     if (isSelfRegistrationWithVerification) {
-                        request.getRequestDispatcher("self-registration-with-verification.jsp").forward(request, response);
+                        request.getRequestDispatcher(SELF_REGISTRATION_WITH_VERIFICATION_PAGE).forward(request, response);
                     } else {
-                        request.getRequestDispatcher("* self-registration-without-verification.jsp").forward(request, response);
+                        request.getRequestDispatcher(SELF_REGISTRATION_WITHOUT_VERIFICATION_PAGE).forward(request, response);
                     }
                 }
 
@@ -155,9 +168,9 @@
                     request.setAttribute("errorMsg", IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
                             "Password.cannot.be.empty"));
                     if (isSelfRegistrationWithVerification) {
-                        request.getRequestDispatcher("self-registration-with-verification.jsp").forward(request, response);
+                        request.getRequestDispatcher(SELF_REGISTRATION_WITH_VERIFICATION_PAGE).forward(request, response);
                     } else {
-                        request.getRequestDispatcher("* self-registration-without-verification.jsp").forward(request, response);
+                        request.getRequestDispatcher(SELF_REGISTRATION_WITHOUT_VERIFICATION_PAGE).forward(request, response);
                     }
                 }
 
@@ -166,6 +179,27 @@
 
                 User user = IdentityManagementServiceUtil.getInstance().resolveUser(username, tenantDomain, isSaaSApp);
 
+                Integer code = (Integer) request.getSession().getAttribute("userNameValidityStatusCode");
+                if (code != null && SelfRegistrationStatusCodes.ERROR_CODE_USER_ALREADY_EXISTS.equalsIgnoreCase(code.toString())) {
+                    request.setAttribute("callback", callback);
+                    request.setAttribute("userTenantDomain", user.getTenantDomain());
+                    request.getRequestDispatcher(SELF_REGISTRATION_COMPLETE_PAGE).forward(request, response);
+                    return;
+                }
+
+                IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
+                ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(user.getTenantDomain(),
+                        SELF_SIGN_UP_CONNECTOR);
+                org.wso2.carbon.identity.application.common.model.Property[] governanceProperties =
+                        connectorConfig.getProperties();
+                for (org.wso2.carbon.identity.application.common.model.Property property : governanceProperties) {
+                    if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
+                        isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+                    }
+                    if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
+                        isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
+                    }
+                }
 
                 Claim[] claims = new Claim[0];
 
@@ -262,15 +296,26 @@
                         request.setAttribute("isAutoLoginEnabled", true);
                     }
                     request.setAttribute("callback", callback);
-                    request.getRequestDispatcher("self-registration-complete.jsp").forward(request, response);
+                    request.setAttribute("userTenantDomain", user.getTenantDomain());
+                    request.getRequestDispatcher(SELF_REGISTRATION_COMPLETE_PAGE).forward(request, response);
 
                 } catch (Exception e) {
                     IdentityManagementEndpointUtil.addErrorInformation(request, e);
                     String errorCode = (String) request.getAttribute("errorCode");
-                    if (passwordPatternErrorCode.equals(errorCode) || invalidCharErrorCode.equals(errorCode)) {
+                    if (passwordPatternErrorCode.equals(errorCode) || invalidCharErrorCode.equals(errorCode) || usernameAlreadyExistsErrorCode.equals(errorCode)) {
                         String i18Resource = IdentityManagementEndpointUtil.i18n(recoveryResourceBundle, errorCode);
                         if (!i18Resource.equals(errorCode)) {
                             request.setAttribute(ERROR_MESSAGE, i18Resource);
+                        }
+                        if (usernameAlreadyExistsErrorCode.equals(errorCode)) {
+                            if (isAccountVerificationEnabled && !isShowUsernameUnavailabilityEnabled) {
+                                request.setAttribute("callback", callback);
+                                request.setAttribute("userTenantDomain", user.getTenantDomain());
+                                request.getRequestDispatcher(SELF_REGISTRATION_COMPLETE_PAGE).forward(request, response);
+                                return;
+                            }
+                            request.getRequestDispatcher("register.do").forward(request, response);
+                            return;
                         }
                         if (isSelfRegistrationWithVerification) {
                             request.getRequestDispatcher(SELF_REGISTRATION_WITH_VERIFICATION_PAGE).forward(request,

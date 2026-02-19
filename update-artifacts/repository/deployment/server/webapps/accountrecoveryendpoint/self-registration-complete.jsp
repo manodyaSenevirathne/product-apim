@@ -23,9 +23,14 @@
 <%@ page import="java.net.MalformedURLException" %>
 <%@ page import="java.io.File" %>
 <%@ page import="org.wso2.carbon.identity.recovery.util.Utils" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceService" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceServiceImpl" %>
+<%@ page import="org.wso2.carbon.identity.governance.bean.ConnectorConfig" %>
+<%@ page import="org.wso2.carbon.identity.application.common.model.Property" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.wso2.carbon.core.util.SignatureUtil" %>
 <%@ taglib prefix="layout" uri="org.wso2.identity.apps.taglibs.layout.controller" %>
 
 <jsp:directive.include file="includes/localize.jsp"/>
@@ -37,16 +42,32 @@
     String username = request.getParameter("username");
     String userStoreDomain = request.getParameter("userstoredomain");
     String sessionDataKey = StringUtils.EMPTY;
+    String SELF_SIGN_UP_CONNECTOR = "self-sign-up";
+    String SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION = "SelfRegistration.NotifyAccountConfirmation";
     String fullyQualifiedUsername = username;
     boolean hasAutoLoginCookie = IdentityManagementEndpointUtil.getBooleanValue(request.getAttribute("isAutoLoginEnabled"));
+    SignatureUtil.init();
 
     if (StringUtils.isBlank(callback)) {
         callback = IdentityManagementEndpointUtil.getUserPortalUrl(
                 application.getInitParameter(IdentityManagementEndpointConstants.ConfigConstants.USER_PORTAL_URL));
     }
     String confirm = (String) request.getAttribute("confirm");
-    isEmailNotificationEnabled = Boolean.parseBoolean(application.getInitParameter(
-            IdentityManagementEndpointConstants.ConfigConstants.ENABLE_EMAIL_NOTIFICATION));
+    String userTenantDomain = (String) request.getAttribute("userTenantDomain");
+    if (StringUtils.isBlank(userTenantDomain)) {
+        userTenantDomain = tenantDomain;
+    }
+
+    IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
+    ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(userTenantDomain, SELF_SIGN_UP_CONNECTOR);
+    Property[] properties = connectorConfig.getProperties();
+    for (Property property : properties) {
+        if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
+            isEmailNotificationEnabled = Boolean.parseBoolean(property.getValue());
+            break;
+        }
+    }
+
     boolean isSessionDataKeyPresent = false;
     if (StringUtils.isNotBlank(userStoreDomain)) {
         fullyQualifiedUsername = userStoreDomain + "/" + username + "@" + tenantDomain;
