@@ -1104,6 +1104,7 @@
   "apim.synapse_artifact_generator.thread_pool.keep_alive_time_ms": "60000",
   "apim.synapse_artifact_generator.thread_pool.queue_capacity": "50",
   "apim.certificate_manager.events_enabled": true,
+  "apim.mediation.enable_secure_xml_processing": false,
   "transport.thrift.agent.queue_size": "32768",
   "transport.thrift.agent.batch_size": "200",
   "transport.thrift.agent.core_pool_size": "1",
