@@ -51,6 +51,7 @@
   "oauth.grant_type.token_exchange.grant_validator": "org.wso2.carbon.identity.oauth2.grant.token.exchange.TokenExchangeGrantValidator",
   "oauth.grant_type.token_exchange.allow_refresh_tokens": true,
   "oauth.grant_type.token_exchange.iat_validity_period": "1h",
+  "oauth.grant_type.token_exchange.enable_multi_value_claim_handling": "false",
   "oauth.grant_type.uma_ticket.enable": false,
   "oauth.grant_type.uma_ticket.allow_public_client": true,
   "oauth.grant_type.uma_ticket.grant_handler": "org.wso2.carbon.identity.oauth.uma.grant.UMA2GrantHandler",
