@@ -1,12 +1,12 @@
 <%--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2026, WSO2 LLC. (https://www.wso2.com).
   ~
-  ~  WSO2 Inc. licenses this file to you under the Apache License,
-  ~  Version 2.0 (the "License"); you may not use this file except
-  ~  in compliance with the License.
-  ~  You may obtain a copy of the License at
+  ~ WSO2 LLC. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~ http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing,
   ~ software distributed under the License is distributed on an
@@ -14,7 +14,7 @@
   ~ KIND, either express or implied.  See the License for the
   ~ specific language governing permissions and limitations
   ~ under the License.
-  --%>
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.wso2.carbon.identity.application.authentication.endpoint.util.AuthenticationEndpointUtil" %>
@@ -62,84 +62,85 @@
 
 <!doctype html>
 <html lang="en-US">
-<head>
-    <%
-        File headerFile = new File(getServletContext().getRealPath("extensions/header.jsp"));
-        if (headerFile.exists()) {
-    %>
-    <jsp:include page="extensions/header.jsp"/>
-    <% } else { %>
-    <jsp:include page="includes/header.jsp"/>
-    <% } %>
-</head>
-<body>
-    <layout:main layoutName="<%= layout %>" layoutFileRelativePath="<%= layoutFileRelativePath %>" data="<%= layoutData %>" >
-        <layout:component componentName="ProductHeader" >
+    <head>
+        <%
+            File headerFile = new File(getServletContext().getRealPath("extensions/header.jsp"));
+            if (headerFile.exists()) {
+        %>
+        <jsp:include page="extensions/header.jsp"/>
+        <% } else { %>
+        <jsp:include page="includes/header.jsp"/>
+        <% } %>
+    </head>
+    <body>
+        <layout:main layoutName="<%= layout %>" layoutFileRelativePath="<%= layoutFileRelativePath %>"
+                     data="<%= layoutData %>">
+            <layout:component componentName="ProductHeader">
 
-        </layout:component>
-        <layout:component componentName="MainSection" >
+            </layout:component>
+            <layout:component componentName="MainSection">
 
-        </layout:component>
-        <layout:component componentName="ProductFooter" >
+            </layout:component>
+            <layout:component componentName="ProductFooter">
 
-        </layout:component>
-    </layout:main>
+            </layout:component>
+        </layout:main>
 
-    <div class="ui tiny modal notify">
-        <div class="header">
-            <h4 class="modal-title"><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
-                    "Information")%>
-            </h4>
+        <div class="ui tiny modal notify">
+            <div class="header">
+                <h4 class="modal-title"><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
+                        "Information")%>
+                </h4>
+            </div>
+            <div class="content">
+                <p><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
+                        "Username.recovery.information.sent.to.your.email")%>
+                </p>
+            </div>
+            <div class="actions">
+                <button type="button" class="ui primary button cancel" data-dismiss="modal">
+                    <%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle, "Close")%>
+                </button>
+            </div>
         </div>
-        <div class="content">
-            <p><%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
-                    "Username.recovery.information.sent.to.your.email")%>
-            </p>
-        </div>
-        <div class="actions">
-            <button type="button" class="ui primary button cancel" data-dismiss="modal">
-                <%=IdentityManagementEndpointUtil.i18n(recoveryResourceBundle, "Close")%>
-            </button>
-        </div>
-    </div>
 
-    <%-- footer --%>
-    <%
-        File footerFile = new File(getServletContext().getRealPath("extensions/footer.jsp"));
-        if (footerFile.exists()) {
-    %>
+        <%-- footer --%>
+        <%
+            File footerFile = new File(getServletContext().getRealPath("extensions/footer.jsp"));
+            if (footerFile.exists()) {
+        %>
         <jsp:include page="extensions/footer.jsp"/>
-    <% } else { %>
+        <% } else { %>
         <jsp:include page="includes/footer.jsp"/>
-    <% } %>
+        <% } %>
 
-    <script type="application/javascript">
+        <script type="application/javascript">
 
-        $(document).ready(function () {
-            $(".notify").modal({
-                blurring: true,
-                closable: false,
-                onHide: function () {
-                    <%
-                    try {
-                        if (callback != null && AuthenticationEndpointUtil.isSchemeSafeURL(callback)) {
-                    %>
-                    location.href = "<%= IdentityManagementEndpointUtil.getURLEncodedCallback(callback)%>";
-                    <%
-                    }
-                    } catch (URISyntaxException e) {
-                        request.setAttribute("error", true);
-                        request.setAttribute("errorMsg", "Invalid callback URL found in the request.");
-                        if (!StringUtils.isBlank(username)) {
-                            request.setAttribute("username", username);
+            $(document).ready(function () {
+                $(".notify").modal({
+                    blurring: true,
+                    closable: false,
+                    onHide: function () {
+                        <%
+                        try {
+                            if (callback != null && AuthenticationEndpointUtil.isSchemeSafeURL(callback)) {
+                        %>
+                        location.href = "<%= IdentityManagementEndpointUtil.getURLEncodedCallback(callback)%>";
+                        <%
                         }
-                        request.getRequestDispatcher("error.jsp").forward(request, response);
-                        return;
+                        } catch (URISyntaxException e) {
+                            request.setAttribute("error", true);
+                            request.setAttribute("errorMsg", "Invalid callback URL found in the request.");
+                            if (!StringUtils.isBlank(username)) {
+                                request.setAttribute("username", username);
+                            }
+                            request.getRequestDispatcher("error.jsp").forward(request, response);
+                            return;
+                        }
+                        %>
                     }
-                    %>
-                }
-            }).modal("show");
-        });
-    </script>
-</body>
+                }).modal("show");
+            });
+        </script>
+    </body>
 </html>
