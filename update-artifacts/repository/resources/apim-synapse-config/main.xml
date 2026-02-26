@@ -26,6 +26,7 @@
             <property name="RESOURCE" expression="fn:concat('/', $axis2:REST_URL_POSTFIX)"/>
             <property name="HEALTH CHECK URL" expression="$axis2:TransportInURL"/>
         </log>
+        <class name="org.wso2.carbon.apimgt.gateway.mediators.WSAddressingRemovalMediator"/>
         <property name="message.builder.invoked" value="true" scope="axis2" type="BOOLEAN"/>
         <property name="url_axis2" expression="$axis2:TransportInURL"/>
         <filter source="$axis2:TransportInURL" regex="/">
@@ -86,6 +87,8 @@
         <property name="HTTP_SC" value="404" scope="axis2"/>
         <property name="RESPONSE" value="true"/>
         <header name="To" action="remove"/>
+        <header name="ReplyTo" action="remove"/>
+        <header name="FaultTo" action="remove"/>
         <property name="NO_ENTITY_BODY" scope="axis2" action="remove"/>
         <property name="ContentType" scope="axis2" action="remove"/>
         <property name="Authorization" scope="transport" action="remove"/>
