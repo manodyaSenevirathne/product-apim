@@ -1,5 +1,7 @@
-<payloadFactory media-type="json">
-    <format>{"Response" : "Sample Response"}</format>
-    <args/>
-</payloadFactory>
-<loopback/>
+<sequence name="custom-backend" xmlns="http://ws.apache.org/ns/synapse">
+    <payloadFactory media-type="json">
+        <format>{"Response" : "Sample Response"}</format>
+        <args/>
+    </payloadFactory>
+    <loopback/>
+</sequence>
