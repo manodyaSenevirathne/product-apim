@@ -22,6 +22,7 @@
 <%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="org.wso2.carbon.apimgt.impl.utils.APIUtil"%>
 <%@ page import="org.wso2.carbon.identity.application.authentication.endpoint.util.AuthenticationEndpointUtil" %>
 <%@ page import="org.wso2.carbon.identity.application.authentication.endpoint.util.Constants" %>
 <%@ page import="org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils" %>
@@ -45,6 +46,7 @@
 <%@ page import="org.wso2.carbon.utils.multitenancy.MultitenantUtils" %>
 <%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceService" %>
 <%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceServiceImpl" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceException" %>
 <%@ page import="org.wso2.carbon.identity.governance.bean.ConnectorConfig" %>
 <%@ page import="org.wso2.carbon.identity.application.common.model.Property" %>
 <%@ page import="java.io.File" %>
@@ -122,16 +124,27 @@
     }
     user = IdentityManagementServiceUtil.getInstance().resolveUser(tenantQualifiedUsername, tenantDomain, isSaaSApp);
 
-    IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
-    ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(user.getTenantDomain(), SELF_SIGN_UP_CONNECTOR);
-    Property[] properties = connectorConfig.getProperties();
-    for (Property property : properties) {
-        if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
-            isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+    try {
+        String userTenantDomain = user.getTenantDomain();
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(userTenantDomain);
+        if (tenantId != MultitenantConstants.INVALID_TENANT_ID) {
+            IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
+            ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(userTenantDomain, SELF_SIGN_UP_CONNECTOR);
+            Property[] properties = connectorConfig.getProperties();
+            for (Property property : properties) {
+                if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
+                    isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+                }
+                if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
+                    isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
+                }
+            }
         }
-        if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
-            isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
-        }
+    } catch (IdentityRuntimeException | IdentityGovernanceException e) {
+        request.setAttribute("error", true);
+        request.setAttribute("errorMsg", e.getMessage());
+        request.getRequestDispatcher("error.jsp").forward(request, response);
+        return;
     }
 
     if (StringUtils.isEmpty(username)) {
