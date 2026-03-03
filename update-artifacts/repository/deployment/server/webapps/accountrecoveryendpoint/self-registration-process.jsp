@@ -19,6 +19,7 @@
 
 <%@ page import="org.apache.commons.collections.map.HashedMap" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.wso2.carbon.apimgt.impl.utils.APIUtil"%>
 <%@ page import="org.wso2.carbon.core.SameSiteCookie" %>
 <%@ page import="org.wso2.carbon.core.util.SignatureUtil" %>
 <%@ page import="org.wso2.carbon.identity.mgt.constants.SelfRegistrationStatusCodes" %>
@@ -32,6 +33,7 @@
 <%@ page import="org.wso2.carbon.identity.core.util.IdentityTenantUtil" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.client.model.*" %>
 <%@ page import="org.wso2.carbon.identity.recovery.util.Utils" %>
+<%@ page import="org.wso2.carbon.utils.multitenancy.MultitenantConstants" %>
 <%@ page import="org.wso2.carbon.identity.recovery.IdentityRecoveryConstants" %>
 <%@ page import="org.wso2.carbon.identity.base.IdentityRuntimeException" %>
 <%@ page import="org.json.simple.JSONObject" %>
@@ -45,6 +47,7 @@
 <%@ page import="javax.servlet.http.Cookie" %>
 <%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceService" %>
 <%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceServiceImpl" %>
+<%@ page import="org.wso2.carbon.identity.governance.IdentityGovernanceException" %>
 <%@ page import="org.wso2.carbon.identity.governance.bean.ConnectorConfig" %>
 
 <jsp:directive.include file="includes/localize.jsp"/>
@@ -187,18 +190,29 @@
                     return;
                 }
 
-                IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
-                ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(user.getTenantDomain(),
-                        SELF_SIGN_UP_CONNECTOR);
-                org.wso2.carbon.identity.application.common.model.Property[] governanceProperties =
-                        connectorConfig.getProperties();
-                for (org.wso2.carbon.identity.application.common.model.Property property : governanceProperties) {
-                    if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
-                        isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+                try {
+                    String userTenantDomain = user.getTenantDomain();
+                    int tenantId = APIUtil.getTenantIdFromTenantDomain(userTenantDomain);
+                    if (tenantId != MultitenantConstants.INVALID_TENANT_ID) {
+                        IdentityGovernanceService identityGovernanceService = new IdentityGovernanceServiceImpl();
+                        ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(userTenantDomain,
+                                SELF_SIGN_UP_CONNECTOR);
+                        org.wso2.carbon.identity.application.common.model.Property[] governanceProperties =
+                                connectorConfig.getProperties();
+                        for (org.wso2.carbon.identity.application.common.model.Property property : governanceProperties) {
+                            if (property.getName().equalsIgnoreCase(SHOW_USERNAME_UNAVAILABILITY)) {
+                                isShowUsernameUnavailabilityEnabled = Boolean.parseBoolean(property.getValue());
+                            }
+                            if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
+                                isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
+                            }
+                        }
                     }
-                    if (property.getName().equalsIgnoreCase(SELF_REGISTRATION_NOTIFY_ACCOUNT_CONFIRMATION)) {
-                        isAccountVerificationEnabled = Boolean.parseBoolean(property.getValue());
-                    }
+                } catch (IdentityRuntimeException | IdentityGovernanceException e) {
+                    request.setAttribute("error", true);
+                    request.setAttribute("errorMsg", e.getMessage());
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
+                    return;
                 }
 
                 Claim[] claims = new Claim[0];
