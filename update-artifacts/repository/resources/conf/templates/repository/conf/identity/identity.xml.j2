@@ -465,7 +465,6 @@
 		<GrantTypeValidatorImplClass>{{oauth.grant_type.token_exchange.grant_validator}}</GrantTypeValidatorImplClass>
 		<IsRefreshTokenAllowed>{{oauth.grant_type.token_exchange.allow_refresh_tokens}}</IsRefreshTokenAllowed>
 		<IATValidityPeriod>{{oauth.grant_type.token_exchange.iat_validity_period}}</IATValidityPeriod>
-        <EnableMultiValueClaimHandling>{{oauth.grant_type.token_exchange.enable_multi_value_claim_handling}}</EnableMultiValueClaimHandling>
 	</SupportedGrantType>
 	{% endif %}
 	{% for grant_type in oauth.custom_grant_type %}
@@ -965,7 +964,7 @@
             </RenewTokenWithoutRevokingExisting>
         </JWT>
         {% endif %}
-        
+
         <!--
             Disable this property to use the updated session-bound token behavior for OAuth tokens.
             Default value : true
@@ -976,7 +975,7 @@
             Default value : false
         -->
         <AllowSessionBoundTokensAfterIdleSessionExpiry>{{oauth.allow_session_bound_tokens_after_idle_session_expiry}}</AllowSessionBoundTokensAfterIdleSessionExpiry>
-        
+
         <!--
             Enable this property to enforce literal characters in OAuth callback URLs.
             Default value : false
@@ -2842,6 +2841,9 @@
         <Resource context="(.*)/identity/metadata/(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/api/identity/media/v1.0/public/(.*)" secured="false" http-method="GET"/>
         <Resource context="(.*)/identity/oidc/slo(.*)" secured="false" http-method="POST"/>
+        <Resource context="(.*)/endpoints/throttleEventReceiver(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
 </ResourceAccessControl>
 
     <ClientAppAuthentication>
