@@ -22,6 +22,7 @@
 <%@ page import="org.wso2.carbon.identity.mgt.constants.SelfRegistrationStatusCodes" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.client.api.ReCaptchaApi" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.client.model.ReCaptchaProperties" %>
+<%@ page import="org.wso2.carbon.identity.application.authentication.endpoint.util.AuthenticationEndpointUtil" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.IdentityManagementEndpointConstants" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.IdentityManagementServiceUtil" %>
 <%@ page import="org.wso2.carbon.identity.mgt.endpoint.util.client.model.User" %>
@@ -45,11 +46,21 @@
     User user = IdentityManagementServiceUtil.getInstance().getUser(username);
     Object errorCodeObj = request.getAttribute("errorCode");
     Object errorMsgObj = request.getAttribute("errorMsg");
+        
+    // Validate callback URL
     String callback = Encode.forHtmlAttribute(request.getParameter("callback"));
-    boolean isCallBackUrlEmpty = false;
-    if (callback == null || callback.length() == 0) {
-        isCallBackUrlEmpty = true;
+
+    /**
+     * Validate the back to login URL.
+     */
+    if (!StringUtils.isBlank(callback)
+            && !StringUtils.equalsIgnoreCase(callback, "null")
+            && !AuthenticationEndpointUtil.isValidMultiOptionURI(callback)) {
+        callback = null;
     }
+    callback = Encode.forHtmlAttribute(callback);
+    boolean isCallBackUrlEmpty = StringUtils.isBlank(callback);
+
     String errorCode = null;
     String errorMsg = null;
 
@@ -215,7 +226,7 @@
                         <div class="align-right buttons">
                              <% if (!isCallBackUrlEmpty) { %>
                             <a id="goBack"
-                               href='<%=Encode.forHtmlAttribute(request.getParameter("callback"))%>'
+                               href='<%=callback%>'
                                class="ui button link-button">
                             <% } else { %>
                             <a id="goBack" onclick="window.history.back()" class="ui button link-button">
