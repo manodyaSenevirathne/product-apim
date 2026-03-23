@@ -2767,8 +2767,18 @@
         <Resource context="/t/(.*)/services(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/samlsso(.*)" secured="false" http-method="all"/>
         <Resource context="/acs(.*)" secured="false" http-method="all"/>
-        <Resource context="/openidserver(.*)" secured="false" http-method="all"/>
-        <Resource context="/openid(.*)" secured="false" http-method="all"/>
+        <Resource context="/openidserver(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
+        <Resource context="/openid(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
+        <Resource context="/t/(.*)/openidserver(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
+        <Resource context="/t/(.*)/openid(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
         <Resource context="(.*)/passivests(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/samlartresolve(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/oauth/request-token(.*)" secured="false" http-method="all"/>
@@ -2820,7 +2830,9 @@
         <Resource context="(.*)/logincontext(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/registry/resourceContent(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/registry/resource(.*)" secured="false" http-method="all"/>
-        <Resource context="(.*)/registry/tags(.*)" secured="false" http-method="all"/>
+        <Resource context="(.*)/registry/tags(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
         <Resource context="(.*)/registry/atom(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/tryit/JAXRSRequestXSSproxy_ajaxprocessor.jsp" secured="false" http-method="all"/>
         <Resource context="(.*)/admin/jsp/WSRequestXSSproxy_ajaxprocessor.jsp" secured="false" http-method="all"/>
@@ -2837,6 +2849,9 @@
         <Resource context="(.*)/api/identity/config-mgt/v1.0/resource/(.*)/(.*)" secured="true" http-method="PUT"/>
         <Resource context="(.*)/api/identity/config-mgt/v1.0/resource/(.*)/(.*)/(.*)" secured="true" http-method="GET"/>
         <Resource context="(.*)/api/identity/config-mgt/v1.0/resource/(.*)/(.*)/(.*)" secured="true" http-method="DELETE"/>
+        <Resource context="(.*)/remote_tasks_callback(.*)" secured="true" http-method="all">
+            <Permissions>/permission/protected</Permissions>
+        </Resource>
         <Resource context="(.*)/iwa-kerberos(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/identity/metadata/(.*)" secured="false" http-method="all"/>
         <Resource context="(.*)/api/identity/media/v1.0/public/(.*)" secured="false" http-method="GET"/>
