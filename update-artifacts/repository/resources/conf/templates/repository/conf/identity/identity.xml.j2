@@ -2773,10 +2773,10 @@
         <Resource context="/openid(.*)" secured="true" http-method="all">
             <Permissions>/permission/protected</Permissions>
         </Resource>
-        <Resource context="/t/(.*)/openidserver(.*)" secured="true" http-method="all">
+        <Resource context="/t/[^/]+/openidserver(.*)" secured="true" http-method="all">
             <Permissions>/permission/protected</Permissions>
         </Resource>
-        <Resource context="/t/(.*)/openid(.*)" secured="true" http-method="all">
+        <Resource context="/t/[^/]+/openid(.*)" secured="true" http-method="all">
             <Permissions>/permission/protected</Permissions>
         </Resource>
         <Resource context="(.*)/passivests(.*)" secured="false" http-method="all"/>
