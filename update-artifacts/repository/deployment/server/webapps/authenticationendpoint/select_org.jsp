@@ -31,7 +31,12 @@
     String idp = request.getParameter("idp");
     String authenticator = request.getParameter("authenticator");
     String sessionDataKey = request.getParameter(Constants.SESSION_DATA_KEY);
-    int orgCount = Integer.parseInt(request.getParameter("orgCount"));
+    int orgCount = 0;
+    try {
+        orgCount = Integer.parseInt(request.getParameter("orgCount"));
+    } catch (NumberFormatException e) {
+        orgCount = 0;
+    }
 
     String errorMessage = AuthenticationEndpointUtil.i18n(resourceBundle, "error.retry");
     boolean authenticationFailed = false;

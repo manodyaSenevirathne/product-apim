@@ -207,20 +207,19 @@
                             </div>
                         </div>
                         <%
-                            String callback = Encode.forHtmlAttribute(request.getParameter("callback"));
+                            String callback = request.getParameter("callback");
 
                             // Validate the callback URL
-                            if (!StringUtils.isBlank(callback)
-                                    && !StringUtils.equalsIgnoreCase(callback, "null")
-                                    && !AuthenticationEndpointUtil.isValidMultiOptionURI(callback)) {
+                            if (StringUtils.isBlank(callback) 
+                                    || StringUtils.equalsIgnoreCase(callback, "null")
+                                    || !AuthenticationEndpointUtil.isValidMultiOptionURI(callback)) {
                                 callback = null;
                             }
-                            callback = Encode.forHtmlAttribute(callback);
 
                             if (callback != null) {
                         %>
                         <div>
-                            <input type="hidden" name="callback" value="<%=callback %>"/>
+                            <input type="hidden" name="callback" value="<%=Encode.forHtmlAttribute(callback) %>"/>
                         </div>
                         <%
                             }

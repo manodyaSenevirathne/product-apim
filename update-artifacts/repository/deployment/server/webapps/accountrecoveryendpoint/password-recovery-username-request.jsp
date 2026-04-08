@@ -15,6 +15,7 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   --%>
+  
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%@ page import="org.owasp.encoder.Encode" %>
@@ -137,7 +138,7 @@
                                     "If.you.do.not.specify.tenant.domain.consider.as.super.tenant")%>
                             </div>
                             <%
-                                String callback = Encode.forHtmlAttribute(request.getParameter("callback"));
+                                String callback = request.getParameter("callback");
 
                                 // Validate the callback URL
                                 if (!StringUtils.isBlank(callback)

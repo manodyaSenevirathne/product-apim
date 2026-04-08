@@ -136,7 +136,7 @@
                 %>
                     <div class="ui visible negative message" id="error-msg"
                         data-testid="request-claims-page-error-message">
-                        <%= localizedErrorMessage %>
+                        <%=Encode.forHtmlContent(localizedErrorMessage)%>
                     </div>
                 <%
                         }
