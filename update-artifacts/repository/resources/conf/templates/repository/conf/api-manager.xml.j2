@@ -687,6 +687,25 @@
         {% if apim.publisher.supported_document_types is defined %}
         <SupportedDocumentTypes>{{apim.publisher.supported_document_types}}</SupportedDocumentTypes>
         {% endif %}
+        {% if apim.publisher.import_definition_file_size_limit is defined %}
+        <ImportDefinitionFileSizeLimit>
+            {% if apim.publisher.import_definition_file_size_limit.oas is defined %}
+            <OAS>{{apim.publisher.import_definition_file_size_limit.oas}}</OAS>
+            {% endif %}
+            {% if apim.publisher.import_definition_file_size_limit.async is defined %}
+            <ASYNC>{{apim.publisher.import_definition_file_size_limit.async}}</ASYNC>
+            {% endif %}
+            {% if apim.publisher.import_definition_file_size_limit.wsdl is defined %}
+            <WSDL>{{apim.publisher.import_definition_file_size_limit.wsdl}}</WSDL>
+            {% endif %}
+            {% if apim.publisher.import_definition_file_size_limit.graphql is defined %}
+            <GRAPHQL>{{apim.publisher.import_definition_file_size_limit.graphql}}</GRAPHQL>
+            {% endif %}
+            {% if apim.publisher.import_definition_file_size_limit.mcp is defined %}
+            <MCP>{{apim.publisher.import_definition_file_size_limit.mcp}}</MCP>
+            {% endif %}
+        </ImportDefinitionFileSizeLimit>
+        {% endif %}
     </APIPublisher>
 
     <!-- Status observers can be registered against the API Publisher to listen for
