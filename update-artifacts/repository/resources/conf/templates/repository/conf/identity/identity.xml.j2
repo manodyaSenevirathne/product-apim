@@ -465,6 +465,7 @@
 		<GrantTypeValidatorImplClass>{{oauth.grant_type.token_exchange.grant_validator}}</GrantTypeValidatorImplClass>
 		<IsRefreshTokenAllowed>{{oauth.grant_type.token_exchange.allow_refresh_tokens}}</IsRefreshTokenAllowed>
 		<IATValidityPeriod>{{oauth.grant_type.token_exchange.iat_validity_period}}</IATValidityPeriod>
+        <EnableMultiValueClaimHandling>{{oauth.grant_type.token_exchange.enable_multi_value_claim_handling}}</EnableMultiValueClaimHandling>
 	</SupportedGrantType>
 	{% endif %}
 	{% for grant_type in oauth.custom_grant_type %}
