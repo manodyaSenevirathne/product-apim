@@ -195,8 +195,11 @@
      */
     if (StringUtils.isBlank(callback) || StringUtils.equalsIgnoreCase(callback, "null")) {
         callback = null;
-    } else if (!AuthenticationEndpointUtil.isValidMultiOptionURI(callback)) {
-        callback = null;
+    } else {
+        String encodedCallback = IdentityManagementEndpointUtil.getURLEncodedCallback(callback);
+        if (!AuthenticationEndpointUtil.isValidMultiOptionURI(encodedCallback)) {
+            callback = null;
+        }
     }
 
 
