@@ -45,6 +45,14 @@ public class VHostDTO {
         @SerializedName(SERIALIZED_NAME_HTTPS_PORT)
             private Integer httpsPort;
 
+        public static final String SERIALIZED_NAME_WS_HOST = "wsHost";
+        @SerializedName(SERIALIZED_NAME_WS_HOST)
+            private String wsHost;
+
+        public static final String SERIALIZED_NAME_WSS_HOST = "wssHost";
+        @SerializedName(SERIALIZED_NAME_WSS_HOST)
+            private String wssHost;
+
         public static final String SERIALIZED_NAME_WS_PORT = "wsPort";
         @SerializedName(SERIALIZED_NAME_WS_PORT)
             private Integer wsPort;
@@ -145,6 +153,52 @@ public class VHostDTO {
     }
 
 
+        public VHostDTO wsHost(String wsHost) {
+        
+        this.wsHost = wsHost;
+        return this;
+        }
+
+    /**
+        * Get wsHost
+    * @return wsHost
+    **/
+        @javax.annotation.Nullable
+      @ApiModelProperty(example = "mg.wso2.com", value = "")
+    
+    public String getWsHost() {
+        return wsHost;
+    }
+
+
+    public void setWsHost(String wsHost) {
+        this.wsHost = wsHost;
+    }
+
+
+        public VHostDTO wssHost(String wssHost) {
+        
+        this.wssHost = wssHost;
+        return this;
+        }
+
+    /**
+        * Get wssHost
+    * @return wssHost
+    **/
+        @javax.annotation.Nullable
+      @ApiModelProperty(example = "mg.wso2.com", value = "")
+    
+    public String getWssHost() {
+        return wssHost;
+    }
+
+
+    public void setWssHost(String wssHost) {
+        this.wssHost = wssHost;
+    }
+
+
         public VHostDTO wsPort(Integer wsPort) {
         
         this.wsPort = wsPort;
@@ -204,13 +258,15 @@ public class VHostDTO {
             Objects.equals(this.httpContext, vhost.httpContext) &&
             Objects.equals(this.httpPort, vhost.httpPort) &&
             Objects.equals(this.httpsPort, vhost.httpsPort) &&
+            Objects.equals(this.wsHost, vhost.wsHost) &&
+            Objects.equals(this.wssHost, vhost.wssHost) &&
             Objects.equals(this.wsPort, vhost.wsPort) &&
             Objects.equals(this.wssPort, vhost.wssPort);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(host, httpContext, httpPort, httpsPort, wsPort, wssPort);
+        return Objects.hash(host, httpContext, httpPort, httpsPort, wsHost, wssHost, wsPort, wssPort);
     }
 
 
@@ -222,6 +278,8 @@ sb.append("class VHostDTO {\n");
     sb.append("    httpContext: ").append(toIndentedString(httpContext)).append("\n");
     sb.append("    httpPort: ").append(toIndentedString(httpPort)).append("\n");
     sb.append("    httpsPort: ").append(toIndentedString(httpsPort)).append("\n");
+    sb.append("    wsHost: ").append(toIndentedString(wsHost)).append("\n");
+    sb.append("    wssHost: ").append(toIndentedString(wssHost)).append("\n");
     sb.append("    wsPort: ").append(toIndentedString(wsPort)).append("\n");
     sb.append("    wssPort: ").append(toIndentedString(wssPort)).append("\n");
 sb.append("}");

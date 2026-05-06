@@ -305,8 +305,15 @@ public class EnvironmentTestCase extends APIMIntegrationBaseTest {
         String description = "Gateway environment deployed in US region";
         String provider = Constants.WSO2_GATEWAY_ENVIRONMENT;
         List<VHostDTO> vHostDTOList = new ArrayList<>();
-        vHostDTOList.add(DtoFactory.createVhostDTO("us.mg.wso2.com", "", 80, 443, 9099, 8099));
-        vHostDTOList.add(DtoFactory.createVhostDTO("foods.com", "zfoods", 8280, 8243, 9099, 8099));
+        VHostDTO vhost1 = DtoFactory.createVhostDTO("us.mg.wso2.com", "", 80, 443, 9099, 8099);
+        VHostDTO vhost2 = DtoFactory.createVhostDTO("foods.com", "zfoods", 8280, 8243, 9099, 8099);
+        vhost1.setWsHost("us.mg.wso2.com");
+        vhost1.setWssHost("us.mg.wso2.com");
+        vhost2.setWsHost("foods.com");
+        vhost2.setWssHost("foods.com");
+        vHostDTOList.add(vhost1);
+        vHostDTOList.add(vhost2);
+        
         environmentDTO = DtoFactory.createEnvironmentDTO(name, displayName, description, provider, false, vHostDTOList, null);
 
         //Add the environment
@@ -737,7 +744,8 @@ public class EnvironmentTestCase extends APIMIntegrationBaseTest {
      * @return EnvironmentDTO with default configs
      */
     private EnvironmentDTO getConfiguredGatewayEnvironment() {
-        VHostDTO vhostDTO = DtoFactory.createVhostDTO("localhost", "", 8780, 8743, 9099, 8099);
+        VHostDTO vhostDTO = DtoFactory.createVhostDTO("localhost", "", 8780, 8743, 9099, null);
+        vhostDTO.setWsHost("localhost");
         EnvironmentDTO configuredEnv = DtoFactory.createEnvironmentDTO(
                                         Constants.GATEWAY_ENVIRONMENT,
                                         Constants.GATEWAY_ENVIRONMENT,

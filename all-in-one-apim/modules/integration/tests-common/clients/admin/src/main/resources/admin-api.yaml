@@ -6243,6 +6243,12 @@ components:
         httpsPort:
           type: integer
           example: 443
+        wsHost:
+          type: string
+          example: mg.wso2.com
+        wssHost:
+          type: string
+          example: mg.wso2.com
         wsPort:
           type: integer
           example: 9099
