@@ -391,7 +391,8 @@
     "/api/users/v2/me/webauthn",
     "/api/",
     "/user-portal/",
-    "/keymanager-operations/"
+    "/keymanager-operations/",
+    "/authenticationendpoint/"
   ],
   "resource.access_control": [
     {
@@ -1896,6 +1897,9 @@
   "user.association.enable_for_federated_users": false,
   "user.enable_per_user_functionality_locking": false,
   "tenant_context.enable_tenant_qualified_urls": false,
+  "tenant_context.require_super_tenant_in_urls": false,
+  "tenant_context.enable_tenanted_sessions": false,
+  "tenant_context.skip_tenant_validation_for_oauth_endpoints": false,
   "tenant_context.rewrite.servlets": [
     "/identity/(.*)",
     "/identity/metadata/saml2",
