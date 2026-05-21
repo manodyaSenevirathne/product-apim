@@ -432,9 +432,19 @@
         <classes>
             <class name="org.wso2.am.integration.tests.jwt.idp.ExternalIDPJWTTestSuite"/>
             <class name="org.wso2.am.integration.tests.jwt.idp.ExternalIDPJWTTestCase"/>
+            <class name="org.wso2.am.integration.tests.jwt.idp.TokenExchangeMultiValueClaimDisabledTestCase"/>
         </classes>
     </test>
 
+    <test name="apim-integration-tests-token-exchange-multi-value-claims" preserve-order="true" parallel="false"
+          group-by-instances="true">
+        <parameter name="group" value="group2"/>
+        <classes>
+            <class name="org.wso2.am.integration.tests.jwt.idp.TokenExchangeMultiValueClaimEnabledTestSuite"/>
+            <class name="org.wso2.am.integration.tests.jwt.idp.TokenExchangeMultiValueClaimEnabledTestCase"/>
+        </classes>
+    </test>
+    
     <test name="apim-integration-emailusername-login" preserve-order="true" parallel="false"
           group-by-instances="true">
         <parameter name="group" value="group2"/>
