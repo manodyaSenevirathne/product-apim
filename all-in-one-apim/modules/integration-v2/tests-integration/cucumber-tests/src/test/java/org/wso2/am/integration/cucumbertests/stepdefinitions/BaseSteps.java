@@ -414,10 +414,12 @@ public class BaseSteps {
 
         Object contextValue = Utils.resolveFromContext(sourceKey);
 
-        if (!(contextValue instanceof JSONObject jsonObject)) {
+        if (!(contextValue instanceof JSONObject)) {
             throw new IllegalStateException("Expected JSONObject in TestContext for key '" + sourceKey
                             + "' but found: " + contextValue.getClass().getSimpleName());
         }
+
+        JSONObject jsonObject = (JSONObject) contextValue;
 
         if (!jsonObject.has(fieldName)) {
             throw new AssertionError(
@@ -796,11 +798,13 @@ public class BaseSteps {
                                                             DataTable propertiesTable) {
 
         Object contextValue = Utils.resolveFromContext(contextKey);
-        if (!(contextValue instanceof JSONArray jsonArray)) {
+        if (!(contextValue instanceof JSONArray)) {
             throw new IllegalStateException(
                     "Expected JSONArray in TestContext for key '" + contextKey + "' but found: "
                             + contextValue.getClass().getSimpleName());
         }
+
+        JSONArray jsonArray = (JSONArray) contextValue;
 
         // Get the raw map from the DataTable
         Map<String, String> rawProperties = propertiesTable.asMap(String.class, String.class);

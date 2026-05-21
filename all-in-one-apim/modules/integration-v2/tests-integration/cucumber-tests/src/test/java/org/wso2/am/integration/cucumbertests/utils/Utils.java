@@ -752,27 +752,22 @@ public class Utils {
         }
 
         try {
-            switch (actualValue) {
-                case Boolean b -> {
-                    Assert.assertEquals(String.valueOf(actualValue), expectedValue, "Boolean values do not match");
-                    return;
-                }
-                case Number number -> {
-                    Assert.assertEquals(String.valueOf(actualValue), expectedValue, "Numeric values do not match");
-                    return;
-                }
-                case JSONArray actualArray -> {
-                    JSONArray expectedArray = new JSONArray(expectedValue);
-                    JSONAssert.assertEquals(expectedArray, actualArray, JSONCompareMode.LENIENT);
-                    return;
-                }
-                case JSONObject actualObject -> {
-                    JSONObject expectedObject = new JSONObject(expectedValue);
-                    JSONAssert.assertEquals(expectedObject, actualObject, JSONCompareMode.LENIENT);
-                    return;
-                }
-                default -> {
-                }
+            if (actualValue instanceof Boolean) {
+                Assert.assertEquals(String.valueOf(actualValue), expectedValue, "Boolean values do not match");
+                return;
+            } else if (actualValue instanceof Number) {
+                Assert.assertEquals(String.valueOf(actualValue), expectedValue, "Numeric values do not match");
+                return;
+            } else if (actualValue instanceof JSONArray) {
+                JSONArray actualArray = (JSONArray) actualValue;
+                JSONArray expectedArray = new JSONArray(expectedValue);
+                JSONAssert.assertEquals(expectedArray, actualArray, JSONCompareMode.LENIENT);
+                return;
+            } else if (actualValue instanceof JSONObject) {
+                JSONObject actualObject = (JSONObject) actualValue;
+                JSONObject expectedObject = new JSONObject(expectedValue);
+                JSONAssert.assertEquals(expectedObject, actualObject, JSONCompareMode.LENIENT);
+                return;
             }
 
             Assert.assertEquals(String.valueOf(actualValue), expectedValue, "String values do not match");
