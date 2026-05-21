@@ -21,13 +21,13 @@
     <parent>
         <groupId>org.wso2.am</groupId>
         <artifactId>am-parent</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.6.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>integration-v2</artifactId>
     <name>WSO2 API Manager - Integration Tests 2</name>
-    <version>4.6.0-SNAPSHOT</version>
+    <version>4.6.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>tests-common</module>
@@ -62,7 +62,7 @@
         <apim.database.validationQuery>SELECT 1</apim.database.validationQuery>
 
         <!-- APIM server name -->
-        <apim.server.version>4.6.0-SNAPSHOT</apim.server.version>
+        <apim.server.version>4.6.0</apim.server.version>
         <apim.server.name>wso2am-${apim.server.version}</apim.server.name>
 
         <!-- APIM docker image-->
