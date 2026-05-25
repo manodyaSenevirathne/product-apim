@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipCertificateFetch>true</skipCertificateFetch>
         <!-- Docker extra hosts for host.docker.internal resolution (needed on Linux/CI) -->
-        <docker.extra.hosts></docker.extra.hosts>
+        <docker.extra.hosts>--add-host=host.docker.internal:host-gateway</docker.extra.hosts>
     </properties>
 
     <dependencies>
