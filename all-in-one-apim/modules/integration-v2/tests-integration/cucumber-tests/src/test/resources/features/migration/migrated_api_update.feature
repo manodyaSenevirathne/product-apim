@@ -109,9 +109,9 @@ Feature: Migrated API Updates
       """
 
     Examples:
-      | apiID            |  apiUpdatePayload                 | configType       | configValue                                                                                           |
-      | RestApiId        | ADPRestAPIPayload                 |operations        | [{"payloadSchema":null,"operationPolicies":{"request":[],"response":[],"fault":[]},"verb":"POST","uriMapping":null,"throttlingPolicy":"Unlimited","target":"/newlyAddedResource","amznResourceContentEncode":null,"usedProductIds":[],"amznResourceName":null,"id":"","scopes":["adp-local-scope-without-roles"],"amznResourceTimeout":null,"authType":"Application & Application User"}]    |
-      | GraphQLApiId     | ADPGraphQLAPIPayload              |operations        | [{"payloadSchema":null,"operationPolicies":{"request":[],"response":[],"fault":[]},"verb":"QUERY","uriMapping":null,"throttlingPolicy":"Unlimited","target":"newlyAddedResource","amznResourceContentEncode":null,"usedProductIds":[],"amznResourceName":null,"id":"","scopes":["adp-admin","adp-film-subscriber"],"amznResourceTimeout":null,"authType":"Application & Application User"}]    |
+      | apiID        | apiUpdatePayload     | expectedVerb | expectedTarget      | scopes                               | configValue |
+      | RestApiId    | ADPRestAPIPayload    | POST         | newlyAddedResource  | ["adp-local-scope-without-roles"]    | {"payloadSchema":null,"operationPolicies":{"request":[],"response":[],"fault":[]},"verb":"POST","uriMapping":null,"throttlingPolicy":"Unlimited","target":"newlyAddedResource","amznResourceContentEncode":null,"usedProductIds":[],"amznResourceName":null,"id":"","scopes":["adp-local-scope-without-roles"],"amznResourceTimeout":null,"authType":"Application & Application User"} |
+      | GraphQLApiId | ADPGraphQLAPIPayload | QUERY        | newlyAddedResource  | ["adp-admin","adp-film-subscriber"]  | {"payloadSchema":null,"operationPolicies":{"request":[],"response":[],"fault":[]},"verb":"QUERY","uriMapping":null,"throttlingPolicy":"Unlimited","target":"newlyAddedResource","amznResourceContentEncode":null,"usedProductIds":[],"amznResourceName":null,"id":"","scopes":["adp-admin","adp-film-subscriber"],"amznResourceTimeout":null,"authType":"Application & Application User"} |
 
 
 # Step 5: Custom properties (refer artifacts/payloads/MigratedAPIs for existing configs)

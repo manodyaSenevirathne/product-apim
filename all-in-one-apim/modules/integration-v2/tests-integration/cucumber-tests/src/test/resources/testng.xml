@@ -12,10 +12,8 @@
             <class name="org.wso2.am.integration.cucumbertests.runners.common.TenantUserInitializationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.common.MigratedTenantUserInitilizationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.publisher.CreateDeployPublishTestRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.publisher.APIBoundApiKeyRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.migration.MigratedLegacyApiKeyInvocationRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.migration.APIBoundApiKeyWithMigratedArtifactsRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.migration.LegacyApiKeyRunner"/>
+            <class name="org.wso2.am.integration.cucumbertests.runners.publisher.ApiKeyRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.publisher.ImportOASDefinitionRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.publisher.APIRuntimeConfigurationsRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.publisher.CreateAPITestRunner"/>
@@ -38,8 +36,8 @@
             <class name="org.wso2.am.integration.cucumbertests.runners.migration.APIPoliciesRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.migration.MigratedApplicationUpdateRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.migration.MigratedApplicationSubscriptionRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.migration.MigratedApplicationOauthKeysRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.migration.APIProviderChangeRunner"/>
+            <class name="org.wso2.am.integration.cucumbertests.runners.migration.MigratedApplicationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.common.SystemShutdown"/>
         </classes>
     </test>
@@ -48,16 +46,6 @@
             <class name="org.wso2.am.integration.cucumbertests.runners.common.CustomHeaderSystemInitializationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.common.TenantUserInitializationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.header.CustomAuthorizationHeaderTestRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.common.SystemShutdown"/>
-        </classes>
-    </test>
-    <test name="LegacyApplicationTests">
-        <classes>
-            <class name="org.wso2.am.integration.cucumbertests.runners.common.LegacyApplicationSystemInitializationRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.common.TenantUserInitializationRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.common.MigratedTenantUserInitilizationRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.legacyApplications.CreateApplicationRunner"/>
-            <class name="org.wso2.am.integration.cucumbertests.runners.migration.legacyApplications.LegacyMigratedApplicationRunner"/>
             <class name="org.wso2.am.integration.cucumbertests.runners.common.SystemShutdown"/>
         </classes>
     </test>

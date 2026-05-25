@@ -412,12 +412,12 @@ public class ApplicationBaseSteps {
      *
      * @param appId Context key containing the application ID
      */
-    @When("I delete the generated keys for {string}")
-    public void iDeleteTheGeneratedKeysFor(String appId) {
+    @When("I delete the generate key with key mapping id {string} for application {string}")
+    public void iDeleteTheGeneratedKeysWithIdOfApplication(String keyMappingId, String appId) {
 
         String actualAppId = Utils.resolveFromContext(appId).toString();
-        String keyMappingId = Utils.resolveFromContext("keyMappingId").toString();
-        String url = Utils.getUpdateKey(baseUrl, actualAppId, keyMappingId);
+        String actualKeyMappingId = Utils.resolveFromContext(keyMappingId).toString();
+        String url = Utils.getUpdateKey(baseUrl, actualAppId, actualKeyMappingId);
 
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.REQUEST_HEADERS.AUTHORIZATION, "Bearer " + TestContext.get("devportalAccessToken").toString());
