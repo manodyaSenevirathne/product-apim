@@ -61,6 +61,9 @@
     <!-- Configuration to disable appending the charset parameter to each part of multipart form data -->
     <parameter name="disableSendingMultipartPartCharset" locked="false">{{message_formatter.options.disableSendingMultipartPartCharset | default(false)}}</parameter>
 
+    <!-- Configuration to preserve Content-Transfer-Encoding header in each part of multipart form data -->
+    <parameter name="preserveMultipartPartContentTransferEncoding" locked="false">{{message_formatter.options.preserveMultipartPartContentTransferEncoding | default(false)}}</parameter>
+
     <parameter name="Sandesha2StorageManager">inmemory</parameter>
 
     <!-- This deployment interceptor will be called whenever before a module is initialized or
