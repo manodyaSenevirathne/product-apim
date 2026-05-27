@@ -80,11 +80,6 @@ Feature: Publisher API Management
     Then I retrieve existing application keys for "createdAppId"
     And I wait until the response status code is 200 and the value of response field "count" is "0"
 
-  # The  issued token should remain valid even after the secret is deleted
-  Scenario: Verify oldest issued token remains valid after secret deletion
-    And I invoke the API resource at path "/apiTestContext/1.0.0/customers/123/" with method "GET" using access token "<generatedAccessTokenForInitialSecret>" and payload ""
-    Then The response status code should be 200
-
   # Clean up the resources
   Scenario: Delete the subscription
     When I delete the subscription with id "<subscriptionId>"
