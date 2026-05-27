@@ -1,4 +1,4 @@
-<secureVaults>
+<secureVaults xmlns:svns="http://org.wso2.securevault/configuration">
     {% set external_vaults = external_vault if external_vault is defined else [] %}
     {% for vault in external_vaults %}
     {% if vault.name is defined %}
