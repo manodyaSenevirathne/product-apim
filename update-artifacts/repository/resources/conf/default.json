@@ -679,6 +679,7 @@
   "config_data.data_source": "$ref{governance_data.data_source}",
   "config_data.cache_id": "$ref{governance_data.cache_id}",
   "config_data.enable_cache": "$ref{governance_data.enable_cache}",
+  "transport.http.enable": "true",
   "transport.http.properties.port": "9763",
   "transport.http.properties.redirectPort": "9443",
   "transport.http.properties.bindOnInit": "false",
