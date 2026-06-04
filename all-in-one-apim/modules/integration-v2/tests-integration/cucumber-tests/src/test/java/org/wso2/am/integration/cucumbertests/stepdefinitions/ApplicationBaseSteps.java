@@ -1023,17 +1023,15 @@ public class ApplicationBaseSteps {
         TestContext.set(Constants.PENDING_HTTP_REQUEST, requestAction);
     }
 
-    // --- Legacy (application-level) API Key steps ---
+    // --- (application-level) API Key steps ---
     /**
-     * Generates a legacy (application-level) API key for an application.
-     * The generated API key value is stored in the context under the given contextKey,
-     * and the keyName is stored as "{contextKey}Name".
+     * Generates an (application-level) API key for an application.
      *
      * @param appId Context key containing the application ID
      * @param payload Context key containing the API key generation JSON payload
      */
-    @When("I generate a legacy api key for application {string} with payload {string}")
-    public void iGenerateLegacyApiKey(String appId, String payload)  {
+    @When("I generate an api key for application {string} with payload {string}")
+    public void iGenerateApiKey(String appId, String payload)  {
 
         String actualAppId = Utils.resolveFromContext(appId).toString();
         String jsonPayload = Utils.resolveFromContext(payload).toString();
@@ -1047,66 +1045,7 @@ public class ApplicationBaseSteps {
                 return SimpleHTTPClient.getInstance().doPost(url, headers, jsonPayload,
                         Constants.CONTENT_TYPES.APPLICATION_JSON);
             } catch (IOException e) {
-                throw new RuntimeException("Legacy API key generation failed for App: " + actualAppId, e);
-            }
-        };
-
-        TestContext.set(Constants.PENDING_HTTP_REQUEST, requestAction);
-    }
-
-    /**
-     * Lists legacy API keys for an application and finds the keyUUID by key name.
-     *
-     * @param appId Context key containing the application ID
-     * @param keyType The key type (PRODUCTION or SANDBOX)
-     */
-    @When("I get the list of legacy api keys for application {string} with key type {string}")
-    public void iFetchLegacyApiKeysList(String appId, String keyType) {
-
-        String actualAppId = Utils.resolveFromContext(appId).toString();
-        String url = Utils.getLegacyApiKeysListURL(baseUrl, actualAppId, keyType);
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.REQUEST_HEADERS.AUTHORIZATION, "Bearer " + TestContext.get("devportalAccessToken").toString());
-
-        RequestAction requestAction = () -> {
-            try {
-                return SimpleHTTPClient.getInstance().doGet(url, headers);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to list legacy API keys for App: " + actualAppId, e);
-            }
-        };
-
-        TestContext.set(Constants.PENDING_HTTP_REQUEST, requestAction);
-    }
-
-    /**
-     * Regenerates a legacy (application-level) API key using the keyUUID.
-     * The new API key value is stored in the context under the given contextKey.
-     *
-     * @param keyUUID Context key containing the key UUID to regenerate
-     * @param appId Context key containing the application ID
-     * @param keyType The key type (PRODUCTION or SANDBOX)
-     */
-    @When("I regenerate legacy api key {string} for application {string} with key type {string}")
-    public void iRegenerateLegacyApiKey(String keyUUID, String appId, String keyType) {
-
-        String actualAppId = Utils.resolveFromContext(appId).toString();
-        String actualKeyUUID = Utils.resolveFromContext(keyUUID).toString();
-        String url = Utils.getLegacyApiKeyRegenerateURL(baseUrl, actualAppId, keyType);
-
-        JSONObject payload = new JSONObject();
-        payload.put("keyUUID", actualKeyUUID);
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.REQUEST_HEADERS.AUTHORIZATION, "Bearer " + TestContext.get("devportalAccessToken").toString());
-
-        RequestAction requestAction = () -> {
-            try {
-                return SimpleHTTPClient.getInstance().doPost(url, headers,
-                        payload.toString(), Constants.CONTENT_TYPES.APPLICATION_JSON);
-            } catch (IOException e) {
-                throw new RuntimeException("Legacy API key regeneration failed for Key: " + actualKeyUUID, e);
+                throw new RuntimeException("API key generation failed for App: " + actualAppId, e);
             }
         };
 

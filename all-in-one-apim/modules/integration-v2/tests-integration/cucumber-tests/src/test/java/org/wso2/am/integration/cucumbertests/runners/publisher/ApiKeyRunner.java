@@ -33,10 +33,9 @@ import org.wso2.carbon.automation.engine.context.beans.User;
 @CucumberOptions(
         features = "src/test/resources/features/publisher/api_key.feature",
         glue = "org.wso2.am.integration.cucumbertests.stepdefinitions",
-        plugin = {"pretty", "html:target/cucumber-report/legacy-api-key.html"}
+        plugin = {"pretty", "html:target/cucumber-report/api-key.html"}
 )
 
-@Test(groups = {"migrationTest"})
 public class ApiKeyRunner extends AbstractTestNGCucumberTests {
 
     private String testUserDomain;
@@ -82,8 +81,10 @@ public class ApiKeyRunner extends AbstractTestNGCucumberTests {
     public Object[][] userModeDataProvider() {
 
         return new Object[][]{
-                {Constants.SUPER_TENANT_DOMAIN, Constants.MIGRATED_SUBSCRIBER_USER_KEY},
-                {Constants.ADPSAMPLE_TENANT_DOMAIN, Constants.ADPSAMPLE_SUBSCRIBER_USER_KEY},
+                {Constants.SUPER_TENANT_DOMAIN, Constants.ADMIN_USER_KEY}, // Super tenant admin
+                {Constants.SUPER_TENANT_DOMAIN, Constants.USER_KEY}, // Super tenant user
+                {Constants.NEW_TENANT_DOMAIN, Constants.NEW_TENANT_ADMIN_USER_KEY},  // Tenant admin
+                {Constants.NEW_TENANT_DOMAIN, Constants.NEW_TENANT_USER_KEY} // Tenant user
         };
     }
 }

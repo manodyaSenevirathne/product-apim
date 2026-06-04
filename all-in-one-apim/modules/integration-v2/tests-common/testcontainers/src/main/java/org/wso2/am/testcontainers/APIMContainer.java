@@ -47,14 +47,6 @@ public class APIMContainer extends GenericContainer<APIMContainer> {
         String apimDbUrl = System.getenv(Constants.API_MANAGER_DATABASE_URL);
         String sharedDbUrl = System.getenv(Constants.SHARED_DATABASE_URL);
 
-        // Replace raw ampersands with XML-safe entities
-        if (apimDbUrl != null) {
-            apimDbUrl = apimDbUrl.replace(Constants.AMPERSAND, Constants.XML_AMPERSAND);
-        }
-        if (sharedDbUrl != null) {
-            sharedDbUrl = sharedDbUrl.replace(Constants.AMPERSAND, Constants.XML_AMPERSAND);
-        }
-
         int offset = Constants.DEFAULT_OFFSET;
 
         // Check if parallel execution is enabled

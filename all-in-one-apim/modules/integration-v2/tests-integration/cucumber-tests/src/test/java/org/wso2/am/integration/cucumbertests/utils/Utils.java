@@ -816,7 +816,6 @@ public class Utils {
         return response;
     }
 
-
     /**
      * Retrieves the pending HTTP request stored in the current test context.
      *

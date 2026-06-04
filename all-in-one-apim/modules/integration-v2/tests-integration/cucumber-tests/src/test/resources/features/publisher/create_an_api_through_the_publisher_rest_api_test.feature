@@ -24,8 +24,7 @@ Feature: Publisher API Management
     And I update "apis" resource of id "<createdApiId>" with payload "<apiUpdatePayload>"
     And I wait until the response status code is 200
     And I retrieve the "apis" resource with id "<createdApiId>"
-    And I wait until the response status code is 200
-    And The response should contain "Updated description for the created API"
+    And I wait until the response status code is 200 and the value of response field "description" is "Updated description for the created API"
     And The response should contain "Gold"
     And The response should contain "Bronze"
     And The response should contain "Silver"

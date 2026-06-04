@@ -431,6 +431,39 @@ public class BaseSteps {
     }
 
     /**
+     * Sets the value of a field on a JSON payload stored in TestContext and stores the updated
+     * payload back under the same key. Supports nested fields using a dot-separated path, creating
+     * intermediate objects when they are missing
+     *
+     * @param fieldPath  Dot-separated path to the field to set (e.g. "businessInformation.businessOwner")
+     * @param value      The value to assign to the field
+     * @param contextKey The context key holding the JSON payload (a JSON string or JSONObject)
+     */
+    @And("I set field {string} to {string} in payload {string}")
+    public void iSetFieldInPayload(String fieldPath, String value, String contextKey) {
+
+        Object contextValue = Utils.resolveFromContext(contextKey);
+
+        JSONObject jsonObject = (contextValue instanceof JSONObject)
+                ? (JSONObject) contextValue
+                : new JSONObject(contextValue.toString());
+
+        String[] keys = fieldPath.split("\\.");
+        JSONObject current = jsonObject;
+        for (int i = 0; i < keys.length - 1; i++) {
+            Object next = current.opt(keys[i]);
+            if (!(next instanceof JSONObject)) {
+                next = new JSONObject();
+                current.put(keys[i], next);
+            }
+            current = (JSONObject) next;
+        }
+        current.put(keys[keys.length - 1], value);
+
+        TestContext.set(Utils.normalizeContextKey(contextKey), jsonObject.toString());
+    }
+
+    /**
      * Verifies that the HTTP response body does not contain the specified string value.
      *
      * @param unexpectedValue The string value that should not be present in the response body

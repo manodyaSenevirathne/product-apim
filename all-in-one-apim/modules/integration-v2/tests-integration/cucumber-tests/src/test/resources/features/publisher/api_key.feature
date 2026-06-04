@@ -1,30 +1,59 @@
-Feature: Migrated Legacy API Key Invocation
+Feature: API Key Invocation
 
   Background:
-    Given The system is ready and I have valid devportal access token for current user
+    Given The system is ready and I have valid access tokens for current user
 
-  # Step 1: Find the migrated API and application
-  Scenario: Setup - Find migrated API and application
-    # Find migrated API from devportal
-    When I find the apiUUID of the API with name "APIM18PublisherTest" and version "1.0.0" from devportal
-    And I wait until the response status code is 200 and the value of response field "count" is "1"
-    And I extract response field "list[0].id" and store it as "<migratedAPIId>"
-    When I retrieve the API with id "<migratedAPIId>" from devportal
+  # Step 1: Create, deploy and publish a new API, create an application and subscribe it
+  Scenario: Setup - Create new API and application
+    # Create a new API
+    When I put JSON payload from file "artifacts/payloads/create_apim_test_api.json" in context as "<createApiPayload>"
+    And I create an "apis" resource with payload "<createApiPayload>"
+    And I wait until the response status code is 201
+    And I extract response field "id" and store it as "<apiKeyTestApiId>"
+
+    # Enable API Key security by setting the apiKeyHeader and securityScheme
+    And I retrieve the "apis" resource with id "<apiKeyTestApiId>"
     And I wait until the response status code is 200
-    And I put the response payload in context as "<migratedAPIPayload>"
+    And I put the response payload in context as "<apiKeyTestApiPayload>"
+    And I set field "apiKeyHeader" to "ApiKey" in payload "<apiKeyTestApiPayload>"
+    And I get the value from json payload "<apiKeyTestApiPayload>" at path "securityScheme" and store it as "<securitySchemesArray>"
+    # Append the API Key security scheme to the extracted security schemes array
+    And I append the following value to the json array "<securitySchemesArray>":
+      """
+      api_key
+      """
+    When I update the "apis" resource "<apiKeyTestApiId>" and "<apiKeyTestApiPayload>" with configuration type "securityScheme" and value from context "<securitySchemesArray>"
+    And I wait until the response status code is 200
 
-    # Find migrated application (already subscribed to the migrated API)
-    When I fetch the application with name "CustomerApp"
-    Then I wait until the response status code is 200
-    And I extract response field "list[0].applicationId" and store it as "<migratedAppId>"
+    # Deploy the API so the updated configuration reaches the Gateway
+    And I deploy the API with id "<apiKeyTestApiId>"
+    And I wait until the response status code is 201
+    And I retrieve the "apis" resource with id "<apiKeyTestApiId>"
+    And I wait until the response status code is 200
+    And I put the response payload in context as "<apiKeyTestDeployedPayload>"
+    And I wait for deployment of the resource in "<apiKeyTestDeployedPayload>"
 
-  # Step 2: Generate legacy API key, invoke, list, regenerate, invoke, revoke, invoke
-  Scenario: Generate, regenerate, revoke legacy API key and invoke API
-    # Generate a PRODUCTION legacy API key
-    When I put the following JSON payload in context as "<legacyApiKeyGenPayload>"
+    # Publish the API
+    And I publish the "apis" resource with id "<apiKeyTestApiId>"
+    And I wait until the response status code is 200
+    Then I get the lifecycle status of API "<apiKeyTestApiId>"
+    Then I wait until the response status code is 200 and the value of response field "state" is "Published"
+
+    # Create a new application
+    When I put JSON payload from file "artifacts/payloads/create_apim_test_app.json" in context as "<createAppPayload>"
+    And I create an application with payload "<createAppPayload>"
+    And I wait until the response status code is 201
+    And I extract response field "applicationId" and store it as "<apiKeyTestAppId>"
+
+    # Subscribe the new application to the new API
+    And I subscribe to resource "<apiKeyTestApiId>" using application "<apiKeyTestAppId>" and store subscription as "<apiKeyTestSubscriptionId>"
+
+  # Step 2: Generate API key, invoke, list, regenerate, invoke, invoke with old key
+  Scenario: Generate, regenerate API key and invoke API
+    # Generate a PRODUCTION API key
+    When I put the following JSON payload in context as "<apiKeyGenPayload>"
     """
     {
-      "keyName": "LegacyTestKey1",
       "validityPeriod": 7200,
       "additionalProperties": {
         "permittedIP": "",
@@ -32,36 +61,50 @@ Feature: Migrated Legacy API Key Invocation
       }
     }
     """
-    And I generate a legacy api key for application "<migratedAppId>" with payload "<legacyApiKeyGenPayload>"
+    And I generate an api key for application "<apiKeyTestAppId>" with payload "<apiKeyGenPayload>"
     And I wait until the response status code is 200
-    And I extract response field "apikey" and store it as "<legacyApiKey1>"
-    And I extract response field "keyName" and store it as "<legacyApiKey1Name>"
+    And I extract response field "apikey" and store it as "<apiKey1>"
     # Allow time for the Gateway cache to sync the new key
-    And I wait for 2 seconds
+    And I wait for 3 seconds
 
-    # List legacy API keys and find the keyUUID by name
-    When I get the list of legacy api keys for application "<migratedAppId>" with key type "PRODUCTION"
-    And I wait until the response status code is 200
-    And I extract response field "$" and store it as "legacyKeysList"
-    And I find the resource with following properties in "legacyKeysList" as "matchedKeyObject"
-      | keyName |  <legacyApiKey1Name> |
-    And I extract field "keyUUID" from "matchedKeyObject" and store it as "legacyKey1UUID"
-
-    # Invoke migrated API with generated legacy key - should succeed
-    When I invoke the API resource at path "/apiContext/1.0.0/customers/123/" with method "GET" using api key "legacyApiKey1"
+    # Invoke the API with the generated key - should succeed
+    When I invoke the API resource at path "/apiTestContext/1.0.0/customers/123/" with method "GET" using api key "apiKey1"
     Then The response status code should be 200
 
-    # Regenerate the legacy API key
-    When I regenerate legacy api key "legacyKey1UUID" for application "migratedAppId" with key type "PRODUCTION"
+    # Regenerate a PRODUCTION API key
+    When I put the following JSON payload in context as "<apiKeyGenPayload>"
+    """
+    {
+      "validityPeriod": 7200,
+      "additionalProperties": {
+        "permittedIP": "",
+        "permittedReferer": ""
+      }
+    }
+    """
+    And I generate an api key for application "<apiKeyTestAppId>" with payload "<apiKeyGenPayload>"
     And I wait until the response status code is 200
-    And I extract response field "apikey" and store it as "legacyApiKey1Regenerated"
+    And I extract response field "apikey" and store it as "apiKey1Regenerated"
     # Allow time for the Gateway cache to sync the new key
     And I wait for 2 seconds
 
     # Invoke API with regenerated key - should succeed
-    When I invoke the API resource at path "/apiContext/1.0.0/customers/123/" with method "GET" using api key "legacyApiKey1Regenerated"
+    When I invoke the API resource at path "/apiTestContext/1.0.0/customers/123/" with method "GET" using api key "apiKey1Regenerated"
     Then The response status code should be 200
 
-    # Invoke API with old key after regeneration - should fail
-    When I invoke the API resource at path "/apiContext/1.0.0/customers/123/" with method "GET" using api key "legacyApiKey1"
-    Then The response status code should be 401
+    # Invoke API with old key after regeneration - should succeed as the old key should still be valid until expiry
+    When I invoke the API resource at path "/apiTestContext/1.0.0/customers/123/" with method "GET" using api key "apiKey1"
+    Then The response status code should be 200
+
+  # Step 3: Clean up
+  Scenario: Delete the subscription
+    When I delete the subscription with id "apiKeyTestSubscriptionId"
+    And I wait until the response status code is 200
+
+  Scenario: Delete the created application
+    When I delete the application with id "apiKeyTestAppId"
+    And I wait until the response status code is 200
+
+  Scenario: Delete the created API
+    When I delete the "apis" resource with id "apiKeyTestApiId"
+    And I wait until the response status code is 200
