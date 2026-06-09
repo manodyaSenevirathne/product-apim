@@ -40,6 +40,7 @@ import org.wso2.carbon.automation.engine.context.TestUserMode;
 import org.wso2.carbon.automation.test.utils.http.client.HttpResponse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.testng.Assert.assertFalse;
@@ -48,6 +49,7 @@ import static org.wso2.am.integration.test.utils.base.APIMIntegrationConstants.S
 public class ApplicationSharingTestCase extends APIMIntegrationBaseTest {
 
     private static final String APPLICATION_NAME = "TestApplication";
+    private static final String APPLICATION_WITH_INVALID_GROUP_NAME = "TestApplicationWithInvalidGroup";
     private static final String SHARED_APPLICATION_NAME = "SharedApplication";
     private static final String USER_ONE = "userOne";
     private static final String USER_TWO = "userTwo";
@@ -109,6 +111,39 @@ public class ApplicationSharingTestCase extends APIMIntegrationBaseTest {
         ApplicationDTO applicationDTO = restAPIStoreClientUser1.getApplicationById(userOneSharedApplicationId);
         Assert.assertEquals(applicationDTO.getDescription(), "This app has been edited");
         Assert.assertEquals(applicationDTO.getThrottlingPolicy(), APIMIntegrationConstants.APPLICATION_TIER.TEN_PER_MIN);
+    }
+
+    @Test(groups = "wso2.am", description = "Create application with leading whitespace in group")
+    public void testCreateApplicationWithLeadingWhitespaceInGroup() throws Exception {
+
+        ApplicationDTO application = new ApplicationDTO();
+        application.setName(APPLICATION_WITH_INVALID_GROUP_NAME);
+        application.setDescription("App created with an invalid application group");
+        application.setThrottlingPolicy(APIMIntegrationConstants.APPLICATION_TIER.UNLIMITED);
+        application.setTokenType(ApplicationDTO.TokenTypeEnum.JWT);
+        application.setGroups(Collections.singletonList(" " + ORGANIZATION));
+
+        try {
+            ApplicationDTO createdApplication = restAPIStoreClientUser1.applicationsApi.applicationsPost(application);
+            if (createdApplication.getApplicationId() != null) {
+                restAPIStoreClientUser1.removeApplicationById(createdApplication.getApplicationId());
+            }
+            Assert.fail("Application creation should fail when a group has leading whitespace");
+        } catch (ApiException e) {
+            Assert.assertEquals(e.getCode(), HttpStatus.SC_BAD_REQUEST);
+        }
+    }
+
+    @Test(groups = "wso2.am", description = "Update application with trailing whitespace in group",
+            dependsOnMethods = "testCreateApplicationWithLeadingWhitespaceInGroup")
+    public void testUpdateApplicationWithTrailingWhitespaceInGroup() {
+
+        HttpResponse serviceResponse = restAPIStoreClientUser1.updateApplicationByID(userOneSharedApplicationId,
+                SHARED_APPLICATION_NAME, "This app has an invalid group",
+                APIMIntegrationConstants.APPLICATION_TIER.TEN_PER_MIN, ApplicationDTO.TokenTypeEnum.JWT,
+                Collections.singletonList(ORGANIZATION + " "));
+        Assert.assertEquals(serviceResponse.getResponseCode(), HttpStatus.SC_BAD_REQUEST,
+                "Response code is not as expected");
     }
 
     @Test(groups = "wso2.am", description = "Edit application by application by user in application group",
