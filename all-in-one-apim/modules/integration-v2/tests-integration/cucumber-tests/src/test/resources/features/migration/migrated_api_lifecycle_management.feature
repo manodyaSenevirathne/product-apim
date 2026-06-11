@@ -26,9 +26,6 @@ Feature: Migrated API Lifecycle Management
     # Publish the API
     When I execute lifecycle action "Publish" on "apis" resource "<apiID>" and wait for state "Published"
 
-    # Demote the API to created state
-    When I execute lifecycle action "Demote to Created" on "apis" resource "<apiID>" and wait for state "Created"
-
     Examples:
       | apiName                  | apiVersion   | apiID         |
       | ADPRestAPI               | 2.0.0        | RestApiId     |

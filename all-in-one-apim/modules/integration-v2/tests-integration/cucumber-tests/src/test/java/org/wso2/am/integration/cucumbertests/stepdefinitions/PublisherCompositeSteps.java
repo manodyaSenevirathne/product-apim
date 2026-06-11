@@ -145,8 +145,11 @@ public class PublisherCompositeSteps {
                         (changeResponse != null ? changeResponse.getResponseCode() : "null") +
                         "]. Data: " + (changeResponse != null ? changeResponse.getData() : "No data available") +
                         ", Proceeding to verification check...");
+            } else {
+                log.info("Lifecycle change request for " + resourceType + " " + resourceId +
+                        " responded with status code [200]. Data: " + changeResponse.getData());
             }
-            baseSteps.waitForSeconds(3);
+            baseSteps.waitForSeconds(5);
 
             // Get the current lifecycle status
             publisherBaseSteps.IGetLifecycleStatusOf(resourceIdKey);
@@ -154,6 +157,9 @@ public class PublisherCompositeSteps {
             HttpResponse getLifecycleResponse = (HttpResponse) TestContext.get(Constants.HTTP_RESPONSE);
             actualLifecycleState = Utils.extractValueFromPayload(getLifecycleResponse.getData(), "state")
                     .toString();
+
+            log.info("Get lifecycle status request for " + resourceType + " " + resourceId +
+                    " responded with Data: " + getLifecycleResponse.getData());
 
             // Check if the current lifecycle state matches the expected state
             if (expectedState.equalsIgnoreCase(actualLifecycleState)) {
@@ -164,8 +170,8 @@ public class PublisherCompositeSteps {
                 stateAchieved = true;
                 break;
             }
-
             log.info("Attempt " + attempt + " failed. Current state: '" + actualLifecycleState + "'. Retrying flow...");
+
         }
 
         Assert.assertTrue(stateAchieved, "Resource " + resourceId + " failed to reach state '"
