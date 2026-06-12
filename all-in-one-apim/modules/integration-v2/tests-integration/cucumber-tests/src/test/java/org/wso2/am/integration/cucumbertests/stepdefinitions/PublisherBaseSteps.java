@@ -579,8 +579,10 @@ public class PublisherBaseSteps {
     public void iCreateANewVersionOfAPI(String newVersion, String resourceType, String resourceID, String isDefault) {
 
         String actualResourceID = Utils.resolveFromContext(resourceID).toString();
+        String actualNewVersion = String.valueOf(Utils.resolveIfContextKey(newVersion));
         boolean defaultVersion = Boolean.parseBoolean(isDefault);
-        String url = Utils.getNewAPIVersionURL(baseUrl, resourceType, newVersion, defaultVersion, actualResourceID);
+        String url = Utils.getNewAPIVersionURL(baseUrl, resourceType, actualNewVersion, defaultVersion,
+                actualResourceID);
 
 
         Map<String, String> headers = new HashMap<>();

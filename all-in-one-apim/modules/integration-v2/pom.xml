@@ -162,20 +162,6 @@
                                 <GATEWAY_ENVIRONMENT>Production and Sandbox</GATEWAY_ENVIRONMENT>
                                 <APIM_TEST_CONTAINERS_PARALLEL_ENABLED>False</APIM_TEST_CONTAINERS_PARALLEL_ENABLED>
                                 <PARALLEL_THREAD_COUNT>1</PARALLEL_THREAD_COUNT>
-
-<!--                                <SHARED_DATABASE_TYPE>${shared.database.type}</SHARED_DATABASE_TYPE>-->
-<!--                                <SHARED_DATABASE_DRIVER>${shared.database.driver}</SHARED_DATABASE_DRIVER>-->
-<!--                                <SHARED_DATABASE_URL>${shared.database.url}</SHARED_DATABASE_URL>-->
-<!--                                <SHARED_DATABASE_USERNAME>${shared.database.username}</SHARED_DATABASE_USERNAME>-->
-<!--                                <SHARED_DATABASE_PASSWORD>${shared.database.password}</SHARED_DATABASE_PASSWORD>-->
-<!--                                <SHARED_DATABASE_VALIDATION_QUERY>${shared.database.validationQuery}</SHARED_DATABASE_VALIDATION_QUERY>-->
-
-<!--                                <API_MANAGER_DATABASE_TYPE>${apim.database.type}</API_MANAGER_DATABASE_TYPE>-->
-<!--                                <API_MANAGER_DATABASE_DRIVER>${apim.database.driver}</API_MANAGER_DATABASE_DRIVER>-->
-<!--                                <API_MANAGER_DATABASE_URL>${apim.database.url}</API_MANAGER_DATABASE_URL>-->
-<!--                                <API_MANAGER_DATABASE_USERNAME>${apim.database.username}</API_MANAGER_DATABASE_USERNAME>-->
-<!--                                <API_MANAGER_DATABASE_PASSWORD>${apim.database.password}</API_MANAGER_DATABASE_PASSWORD>-->
-<!--                                <API_MANAGER_DATABASE_VALIDATION_QUERY>${apim.database.validationQuery}</API_MANAGER_DATABASE_VALIDATION_QUERY>-->
                             </environmentVariables>
                         </configuration>
                     </plugin>

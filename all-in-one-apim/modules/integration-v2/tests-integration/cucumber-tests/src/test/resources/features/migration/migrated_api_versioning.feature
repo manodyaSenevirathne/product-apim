@@ -6,12 +6,7 @@ Feature: Migrated API Versioning
 # Step 1: Find the api
   Scenario Outline: Migrated API Retrieval
     When I find the API created with the name "<apiName>" and version "<apiVersion>"
-    And I wait until the response status code is 200
-    And I extract response field "count" and store it as "<apiCount>"
-    And the actual value of "<apiCount>" should match the expected value:
-      """
-      1
-      """
+    And I wait until the response status code is 200 and the value of response field "count" is "1"
     And I extract response field "list[0].id" and store it as "<apiID>"
 
     And I retrieve the "apis" resource with id "<apiID>"
@@ -28,7 +23,8 @@ Feature: Migrated API Versioning
 
   Scenario Outline: Create new versions of migrated APIs
     # Step 2: Create a new version
-    When I create a new version "<newVersion>" of "apis" resource "<apiID>" with default version "<defaultProperty>"
+    When I append a timestamp to "<newVersion>" and store it as "<newVersionWithTimestamp>"
+    And I create a new version "<newVersionWithTimestamp>" of "apis" resource "<apiID>" with default version "<defaultProperty>"
     And I wait until the response status code is <expectedStatus>
     And The response should contain "<newVersion>"
     And The response should contain "<defaultProperty>"

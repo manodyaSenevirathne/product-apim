@@ -216,6 +216,25 @@ public class BaseSteps {
     }
 
     /**
+     * Appends the current epoch-millisecond timestamp to the given base value and stores the result
+     * in the test context. This guarantees a unique value across sequential runs (for example, when the
+     * same feature is executed by multiple users), avoiding collisions such as creating an API version
+     * that a previous run created but did not fully delete.
+     *
+     * @param baseValue  The base string (a literal such as "5.0.0", or a context key to resolve first)
+     * @param contextKey The key under which the timestamped value should be stored in TestContext
+     */
+    @When("I append a timestamp to {string} and store it as {string}")
+    public void iAppendTimestampAndStoreItAs(String baseValue, String contextKey) {
+
+        String resolvedBase = String.valueOf(Utils.resolveIfContextKey(baseValue));
+        String valueWithTimestamp = resolvedBase + "." + System.currentTimeMillis();
+
+        log.info("Timestamping value: Base='" + resolvedBase + "' Result='" + valueWithTimestamp + "'");
+        TestContext.set(Utils.normalizeContextKey(contextKey), valueWithTimestamp);
+    }
+
+    /**
      * Loads a JSON payload from a file and stores it in the test context.
      *
      * @param jsonFilePath Path to the JSON file
