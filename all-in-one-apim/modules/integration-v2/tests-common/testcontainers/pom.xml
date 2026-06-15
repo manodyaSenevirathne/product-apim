@@ -59,6 +59,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipIntegrationTestsV2}</skip>
                             <executable>python3</executable>
                             <async>true</async>
                             <workingDirectory>${project.basedir}/../../../distribution/product/target</workingDirectory>
@@ -78,6 +79,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipIntegrationTestsV2}</skip>
                             <executable>bash</executable>
                             <arguments>
                                 <argument>-c</argument>
@@ -92,6 +94,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipIntegrationTestsV2}</skip>
                             <executable>docker</executable>
                             <arguments>
                                 <argument>build</argument>
@@ -108,6 +111,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipIntegrationTestsV2}</skip>
                             <executable>bash</executable>
                             <arguments>
                                 <argument>-c</argument>
