@@ -474,6 +474,32 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
         }
     }
 
+    @Test(groups = { "wso2.am" }, description = "Auth code grant without scope should generate token with 'default' scope")
+    public void testAuthCodeGrantWithoutScopeHasDefaultScope() throws Exception {
+
+        ApiResponse<ApplicationKeyDTO> applicationKeysByKeyType = restAPIStore
+                .getApplicationKeysByKeyType(authCodeApplicationId,
+                        ApplicationKeyDTO.KeyTypeEnum.PRODUCTION.getValue());
+        ApplicationKeyDTO applicationKeyDTO = applicationKeysByKeyType.getData();
+        for (String endUser : users) {
+            JSONObject tokenResponse = generateTokenWithAuthCodeGrantNoScope(applicationKeyDTO.getConsumerKey(),
+                    applicationKeyDTO.getConsumerSecret(), endUser, enduserPassword, user);
+            String accessToken = tokenResponse.getString("access_token");
+            String tokenScope = tokenResponse.getString("scope");
+            log.info("Access Token Generated with auth code grant (no scope) ==" + accessToken);
+            Assert.assertEquals(tokenScope, "default",
+                    "Token should contain scope 'default' when no scope is specified in auth code grant");
+
+            String tokenJti = TokenUtils.getJtiOfJwtToken(accessToken);
+            HttpClient httpclient = HttpClientBuilder.create().build();
+            HttpGet get = new HttpGet(getAPIInvocationURLHttp(apiContext, apiVersion));
+            get.addHeader("Authorization", "Bearer " + tokenJti);
+            HttpResponse response = httpclient.execute(get);
+            Assert.assertEquals(response.getStatusLine().getStatusCode(), Response.Status.OK.getStatusCode(),
+                    "Response code mismatched when api invocation");
+        }
+    }
+
     @AfterClass(alwaysRun = true)
     public void destroy() throws Exception {
 
@@ -706,6 +732,58 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
             // error ignored
         }
         return null;
+    }
+
+    private JSONObject generateTokenWithAuthCodeGrantNoScope(String consumerKey, String consumerSecret,
+            String enduserName, String enduserPassword, User user) throws JSONException, IOException {
+
+        String username = enduserName.concat("@").concat(user.getUserDomain());
+        Map<String, String> headers = new HashMap<>();
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        String APPLICATION_CONTENT_TYPE = "application/x-www-form-urlencoded";
+        headers.put("Content-Type", APPLICATION_CONTENT_TYPE);
+        String url = identityLoginURL + "?response_type=code&client_id=" + consumerKey + "&redirect_uri=" + CALLBACK_URL;
+        org.wso2.carbon.automation.test.utils.http.client.HttpResponse res = HTTPSClientUtils.doGet(url, headers);
+        Assert.assertEquals(res.getResponseCode(), HttpStatus.SC_MOVED_TEMPORARILY, "Response code is not as expected");
+        String LOCATION_HEADER = "Location";
+        String locationHeader = res.getHeaders().get(LOCATION_HEADER);
+        Assert.assertNotNull(locationHeader, "Couldn't found Location Header");
+        String SET_COOKIE_HEADER = "Set-Cookie";
+        String sessionNonceCookie = res.getHeaders().get(SET_COOKIE_HEADER);
+        Assert.assertNotNull(sessionNonceCookie, "Couldn't find the sessionNonceCookie Header");
+        String sessionDataKey = getURLParameter(locationHeader, "sessionDataKey");
+        Assert.assertNotNull(sessionDataKey, "Couldn't find sessionDataKey from the Location Header");
+
+        headers.clear();
+        headers.put("Content-Type", APPLICATION_CONTENT_TYPE);
+        headers.put("Cookie", sessionNonceCookie);
+        urlParameters.add(new BasicNameValuePair("username", username));
+        urlParameters.add(new BasicNameValuePair("password", enduserPassword));
+        urlParameters.add(new BasicNameValuePair("tocommonauth", "true"));
+        urlParameters.add(new BasicNameValuePair("sessionDataKey", sessionDataKey));
+
+        res = HTTPSClientUtils.doPost(identityLoginURL, headers, urlParameters);
+        Assert.assertEquals(res.getResponseCode(), HttpStatus.SC_MOVED_TEMPORARILY, "Response code is not as expected");
+        locationHeader = res.getHeaders().get(LOCATION_HEADER);
+        Assert.assertNotNull(locationHeader, "Couldn't found Location Header");
+
+        // If no scopes requested, should skip the consent and redirect directly with the auth code.
+        String tempCode = getURLParameter(locationHeader, "code");
+        Assert.assertNotNull(tempCode,
+                "Auth code not found after login." +
+                        "Expected to redirect directly with the auth code when no scopes are requested");
+
+        headers.clear();
+        urlParameters.clear();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", tempCode));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", CALLBACK_URL));
+        urlParameters.add(new BasicNameValuePair("client_secret", consumerSecret));
+        urlParameters.add(new BasicNameValuePair("client_id", consumerKey));
+
+        res = HTTPSClientUtils.doPost(tokenURL, headers, urlParameters);
+        Assert.assertEquals(res.getResponseCode(), HttpStatus.SC_OK, "Response code is not as expected");
+        return new JSONObject(res.getData());
     }
 
     /**
