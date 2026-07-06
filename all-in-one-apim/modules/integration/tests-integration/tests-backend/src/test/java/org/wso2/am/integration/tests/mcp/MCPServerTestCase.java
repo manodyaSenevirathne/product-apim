@@ -189,6 +189,7 @@ public class MCPServerTestCase extends APIMIntegrationBaseTest {
                     "}";
 
     private static final String EXPECTED_SCHEMA_ECHO =
+            "{ \"inputSchema\": " +
             "{\n" +
                     "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
                     "  \"additionalProperties\": false,\n" +
@@ -200,7 +201,8 @@ public class MCPServerTestCase extends APIMIntegrationBaseTest {
                     "    }\n" +
                     "  },\n" +
                     "  \"required\": [\"message\"]\n" +
-                    "}";
+                    "}" +
+            "}";
 
     private static final String EXPECTED_SCHEMA_DELETE_OLD_PETS =
             "{\n" +
@@ -208,7 +210,8 @@ public class MCPServerTestCase extends APIMIntegrationBaseTest {
                     "  \"properties\": {}\n" +
                     "}";
 
-    private static final String EXPECTED_SCHEMA_ORDER_PIZZA = "{\n" +
+    private static final String EXPECTED_SCHEMA_ORDER_PIZZA = "{ \"inputSchema\": " +
+            "{\n" +
             "  \"$schema\" : \"http://json-schema.org/draft-07/schema#\",\n" +
             "  \"additionalProperties\" : false,\n" +
             "  \"type\" : \"object\",\n" +
@@ -232,6 +235,7 @@ public class MCPServerTestCase extends APIMIntegrationBaseTest {
             "  },\n" +
             "  \"required\" : [ \"pizzaType\", \"quantity\", \"customerName\", \"deliveryAddress\", " +
             "\"creditCardNumber\" ]\n" +
+            "}" +
             "}";
 
     private static final String EXPECTED_ENDPOINT_CONFIG =
