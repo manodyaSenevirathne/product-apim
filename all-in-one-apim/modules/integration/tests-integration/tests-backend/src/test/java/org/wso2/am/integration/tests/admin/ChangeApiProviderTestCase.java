@@ -114,6 +114,7 @@ public class ChangeApiProviderTestCase extends APIMIntegrationBaseTest {
         apiRequest.setDescription(description);
         apiRequest.setVersion(APIVersion);
         apiRequest.setResourceMethod("GET");
+        // Mark this API as the default version (issue #5038 regression check)
         apiRequest.setDefault_version("default_version");
         apiRequest.setDefault_version_checked("true");
         //add test api
@@ -163,7 +164,7 @@ public class ChangeApiProviderTestCase extends APIMIntegrationBaseTest {
                     "API should be marked as default version before provider change");
 
             ApiResponse<Void> changeProviderResponse = restAPIAdminClient.changeApiProvider(newUser, apiID);
-            Assert.assertEquals(changeProviderResponse.getStatusCode(), HttpStatus.SC_OK);
+            assertEquals(changeProviderResponse.getStatusCode(), HttpStatus.SC_OK);
 
             // Assert isDefaultVersion is preserved after provider change (fix for issue #5038)
             APIDTO apiAfterChange = restAPIPublisher.getAPIByID(apiID);
