@@ -81,6 +81,7 @@ public class APIProductCreationTestCase extends APIManagerLifecycleBaseTest {
     private static final String POLICY_TYPE_COMMON = "common";
     private static final String RESTRICTED_ROLE = "restricted_role";
     private static final String SCOPE = "restricted_scope";
+    private static final int API_PRODUCT_CONTEXT_MAX_LENGTH = 232;
     private ApiTestHelper apiTestHelper;
     private ApiProductTestHelper apiProductTestHelper;
     private String apiProductId2;
@@ -294,6 +295,69 @@ public class APIProductCreationTestCase extends APIManagerLifecycleBaseTest {
 
         boolean isDefaultVersion = Boolean.TRUE.equals(newApiProductDTO.isIsDefaultVersion());
         Assert.assertEquals(isDefaultVersion, true, "Copied API Product is not the default version");
+    }
+
+    @Test(groups = {"wso2.am"}, description = "Test creation of API Product with a context within the current max length")
+    public void testCreateApiProductWithLongContext() throws Exception {
+        // Pre-Conditions : Create APIs
+        List<APIDTO> apisToBeUsed = new ArrayList<>();
+        APIDTO apiOne = apiTestHelper.createApiOne(getBackendEndServiceEndPointHttp("wildcard/resources"));
+        APIDTO apiTwo = apiTestHelper.createApiTwo(getBackendEndServiceEndPointHttp("wildcard/resources"));
+        apisToBeUsed.add(apiOne);
+        apisToBeUsed.add(apiTwo);
+        apiID1 = apiOne.getId();
+        apiID2 = apiTwo.getId();
+
+        // Step 1 : Create APIProduct with a context length of 150 < API_PRODUCT_CONTEXT_MAX_LENGTH
+        final String provider = user.getUserName();
+        final String name = UUID.randomUUID().toString();
+        final String context = generateContextOfLength(150);
+        final String version = "1.0.0";
+
+        List<String> policies = Arrays.asList(TIER_UNLIMITED, TIER_GOLD);
+
+        // Step 2 : Verify the API Product is created successfully with the long context
+        // createAPIProductInPublisher already asserts the returned context matches (tenant-prefix aware)
+        apiProductTestHelper.createAPIProductInPublisher(provider, name, context, version, apisToBeUsed, policies);
+    }
+
+    @Test(groups = {"wso2.am"}, description = "Test creation of API Product with a context exceeding the max allowed length")
+    public void testCreateApiProductWithContextExceedingMaxLength() throws Exception {
+        // Pre-Conditions : Create APIs
+        List<APIDTO> apisToBeUsed = new ArrayList<>();
+        APIDTO apiOne = apiTestHelper.createApiOne(getBackendEndServiceEndPointHttp("wildcard/resources"));
+        APIDTO apiTwo = apiTestHelper.createApiTwo(getBackendEndServiceEndPointHttp("wildcard/resources"));
+        apisToBeUsed.add(apiOne);
+        apisToBeUsed.add(apiTwo);
+        apiID1 = apiOne.getId();
+        apiID2 = apiTwo.getId();
+
+        // Step 1 : Create APIProduct with a context 1 character over API_PRODUCT_CONTEXT_MAX_LENGTH
+        final String provider = user.getUserName();
+        final String name = UUID.randomUUID().toString();
+        final String context = generateContextOfLength(API_PRODUCT_CONTEXT_MAX_LENGTH + 1);
+        final String version = "1.0.0";
+
+        List<String> policies = Arrays.asList(TIER_UNLIMITED, TIER_GOLD);
+
+        try {
+            apiProductTestHelper.createAPIProductInPublisher(provider, name, context, version,
+                    apisToBeUsed, policies);
+            Assert.fail("API Product creation should fail when context exceeds " + API_PRODUCT_CONTEXT_MAX_LENGTH
+                    + " characters");
+        } catch (ApiException e) {
+            Assert.assertEquals(e.getCode(), Response.Status.BAD_REQUEST.getStatusCode());
+            Assert.assertTrue(e.getResponseBody().contains(String.valueOf(API_PRODUCT_CONTEXT_MAX_LENGTH)));
+        }
+    }
+
+    // Builds a "/"-prefixed context string of exactly the given length, for boundary testing
+    private String generateContextOfLength(int length) {
+        StringBuilder context = new StringBuilder("/");
+        while (context.length() < length) {
+            context.append(UUID.randomUUID().toString().replace("-", ""));
+        }
+        return context.substring(0, length);
     }
 
     @Test(groups = {"wso2.am"}, description = "Test creation of API Product with malformed context")
